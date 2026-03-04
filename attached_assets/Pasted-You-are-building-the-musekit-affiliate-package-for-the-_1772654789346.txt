@@ -1,0 +1,74 @@
+You are building the @musekit/affiliate package for the MuseKit SaaS platform.
+
+This is a standalone npm package for the complete affiliate/referral program.
+
+## Tech Stack Rules
+- Next.js 14.2.18 (do NOT use 15+ or 16+ features)
+- React 18.3.1
+- Tailwind CSS v3.4.x (do NOT upgrade to v4)
+- TypeScript strict mode
+
+## What to Build
+
+### Affiliate User Dashboard (src/dashboard/)
+- AffiliateDashboard — overview with earnings summary, click stats
+- AffiliateAnalytics — charts showing clicks, conversions, revenue over time
+- AffiliateReferrals — list of referred users with status
+- AffiliateEarnings — earnings history with date range filter
+- AffiliatePayouts — pending and completed payouts
+- AffiliateResources — marketing materials (banners, copy, links)
+- AffiliateTools — link generator, banner embed codes
+- AffiliateNews — updates/announcements from admin
+- AffiliateMessages — messaging between affiliate and admin
+- AffiliateSettings — account settings, payment info
+- AffiliateSupport — support request form
+
+### Affiliate Admin (src/admin/)
+- AffiliateApplications — review, approve, reject applications
+- AffiliateSettings — commission rates, cookie duration, min payout
+- AffiliateAssets — upload/manage marketing materials
+- AffiliateMilestones — achievement definitions (first sale, 10 sales, etc.)
+- AffiliateTiers — bronze, silver, gold tier definitions with commission rates
+- AffiliateBroadcasts — send messages/announcements to all affiliates
+- AffiliateMembers — active affiliate list with performance stats
+- AffiliateNetworks — affiliate network integration settings
+- AffiliateContests — promotional campaign management
+- AffiliatePayoutRuns — batch payment processing
+- AffiliateDiscountCodes — create and manage discount codes
+
+### Core Logic (src/core/)
+- trackReferral(referralCode, visitorId) — record a click
+- attributeConversion(userId, referralCode) — link signup to affiliate
+- calculateCommission(saleAmount, affiliateTier) — compute earnings
+- processPayoutRun(affiliateIds) — batch payout calculation
+- generateReferralLink(affiliateId, campaign?) — create tracking URL
+- validateReferralCode(code) — check if code is valid and active
+
+### Dependencies
+- Install: @musekit/shared (from github:SpeckledDarth/musekit-shared)
+- Install: @musekit/database (from github:SpeckledDarth/musekit-database)
+- Install: @musekit/design-system (from github:SpeckledDarth/musekit-design-system)
+- Install: @musekit/billing (from github:SpeckledDarth/musekit-billing)
+- Install: recharts (for analytics charts), lucide-react (for icons)
+
+### Supabase Tables Used
+Note: The affiliate system may need additional tables beyond the current 15+ core tables.
+Check the existing database for affiliate-related tables. If they don't exist yet,
+document the needed tables in MODULE.md but do NOT create them in Supabase.
+Use mock data structures that match the planned schema.
+
+### Environment Secrets Needed
+- NEXT_PUBLIC_SUPABASE_URL
+- NEXT_PUBLIC_SUPABASE_ANON_KEY
+- SUPABASE_SERVICE_ROLE_KEY
+- STRIPE_SECRET_KEY (for commission tracking against real payments)
+
+### Reference Code
+Original: github.com/SpeckledDarth/master-saas-muse
+Look in: src/app/affiliate/, src/app/(affiliate)/, src/components/affiliate/, src/app/admin/affiliates/
+
+### Rules
+- All UI uses @musekit/design-system components
+- Export everything from src/index.ts
+- Create replit.md and MODULE.md
+- If affiliate tables don't exist in Supabase yet, document the needed schema in MODULE.md

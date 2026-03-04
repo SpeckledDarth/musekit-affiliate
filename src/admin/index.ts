@@ -1,0 +1,11 @@
+export { default as AffiliateApplications } from "@/app/admin/affiliates/applications/page";
+export { default as AdminAffiliateSettings } from "@/app/admin/affiliates/settings/page";
+export { default as AdminAffiliateAssets } from "@/app/admin/affiliates/assets/page";
+export { default as AdminAffiliateMilestones } from "@/app/admin/affiliates/milestones/page";
+export { default as AdminAffiliateTiers } from "@/app/admin/affiliates/tiers/page";
+export { default as AdminAffiliateBroadcasts } from "@/app/admin/affiliates/broadcasts/page";
+export { default as AffiliateMembers } from "@/app/admin/affiliates/members/page";
+export { default as AdminAffiliateNetworks } from "@/app/admin/affiliates/networks/page";
+export { default as AdminAffiliateContests } from "@/app/admin/affiliates/contests/page";
+export { default as AdminAffiliatePayoutRuns } from "@/app/admin/affiliates/payout-runs/page";
+export { default as AdminAffiliateDiscountCodes } from "@/app/admin/affiliates/discount-codes/page";

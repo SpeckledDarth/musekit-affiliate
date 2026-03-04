@@ -1,0 +1,11 @@
+export { default as AffiliateDashboard } from "@/app/affiliate/page";
+export { default as AffiliateAnalytics } from "@/app/affiliate/analytics/page";
+export { default as AffiliateReferrals } from "@/app/affiliate/referrals/page";
+export { default as AffiliateEarnings } from "@/app/affiliate/earnings/page";
+export { default as AffiliatePayouts } from "@/app/affiliate/payouts/page";
+export { default as AffiliateResources } from "@/app/affiliate/resources/page";
+export { default as AffiliateTools } from "@/app/affiliate/tools/page";
+export { default as AffiliateNews } from "@/app/affiliate/news/page";
+export { default as AffiliateMessages } from "@/app/affiliate/messages/page";
+export { default as AffiliateSettings } from "@/app/affiliate/settings/page";
+export { default as AffiliateSupport } from "@/app/affiliate/support/page";
