@@ -1,35 +1,55 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/ui/data-table";
-import { mockPayouts } from "@/lib/mock-data";
+import { api } from "@/lib/api-client";
+import type { AffiliatePayout } from "@/types";
 
 export default function AffiliatePayouts() {
+  const [payouts, setPayouts] = useState<AffiliatePayout[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await api.affiliate.getPayouts();
+        setPayouts(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load data");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
   const columns = [
     {
       key: "created_at",
       header: "Date",
-      render: (item: (typeof mockPayouts)[0]) =>
+      render: (item: AffiliatePayout) =>
         new Date(item.created_at).toLocaleDateString(),
     },
     {
-      key: "amount",
+      key: "amount_cents",
       header: "Amount",
-      render: (item: (typeof mockPayouts)[0]) => (
-        <span className="font-semibold">${item.amount.toFixed(2)}</span>
+      render: (item: AffiliatePayout) => (
+        <span className="font-semibold">${(item.amount_cents / 100).toFixed(2)}</span>
       ),
     },
     {
-      key: "payment_method",
+      key: "method",
       header: "Method",
-      render: (item: (typeof mockPayouts)[0]) => (
-        <span className="capitalize">{item.payment_method}</span>
+      render: (item: AffiliatePayout) => (
+        <span className="capitalize">{item.method}</span>
       ),
     },
     {
       key: "status",
       header: "Status",
-      render: (item: (typeof mockPayouts)[0]) => (
+      render: (item: AffiliatePayout) => (
         <Badge
           variant={
             item.status === "completed"
@@ -46,18 +66,30 @@ export default function AffiliatePayouts() {
       ),
     },
     {
-      key: "transaction_id",
-      header: "Transaction ID",
-      render: (item: (typeof mockPayouts)[0]) =>
-        item.transaction_id ? (
-          <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-            {item.transaction_id}
-          </code>
-        ) : (
-          "-"
-        ),
+      key: "processed_at",
+      header: "Processed",
+      render: (item: AffiliatePayout) =>
+        item.processed_at
+          ? new Date(item.processed_at).toLocaleDateString()
+          : "—",
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-gray-500">Loading payouts...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-red-500">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -69,7 +101,8 @@ export default function AffiliatePayouts() {
       </div>
       <DataTable
         columns={columns}
-        data={mockPayouts}
+        data={payouts}
+        emptyMessage="No payouts yet"
       />
     </div>
   );

@@ -1,12 +1,44 @@
 "use client";
 
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { mockSupportTickets } from "@/lib/mock-data";
+import { api } from "@/lib/api-client";
+import type { SupportTicket } from "@/types";
 
 export default function AffiliateSupport() {
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await api.affiliate.getSupportTickets();
+        setTickets(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load support tickets");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500">{error}</div>;
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
@@ -20,7 +52,10 @@ export default function AffiliateSupport() {
       </div>
 
       <div className="space-y-4">
-        {mockSupportTickets.map((ticket) => (
+        {tickets.length === 0 && (
+          <p className="text-gray-500 text-center py-8">No support tickets yet.</p>
+        )}
+        {tickets.map((ticket) => (
           <Card key={ticket.id}>
             <CardContent className="py-4">
               <div className="flex items-center justify-between">

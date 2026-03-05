@@ -1,5 +1,3 @@
-import type { AffiliateTier } from "@/types";
-
 const TIER_RATES: Record<string, number> = {
   bronze: 0.15,
   silver: 0.20,
@@ -30,7 +28,7 @@ export function attributeConversion(userId: string, referralCode: string) {
 
 export function calculateCommission(
   saleAmount: number,
-  affiliateTier: AffiliateTier["slug"],
+  affiliateTier: string,
 ): number {
   const rate = TIER_RATES[affiliateTier] ?? 0.15;
   return Math.round(saleAmount * rate * 100) / 100;

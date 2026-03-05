@@ -1,37 +1,50 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Plus } from "lucide-react";
-import { mockPayoutRuns } from "@/lib/mock-data";
+import { api } from "@/lib/api-client";
+import type { AffiliatePayoutBatch } from "@/types";
 
 export default function AdminAffiliatePayoutRuns() {
+  const [batches, setBatches] = useState<AffiliatePayoutBatch[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    api.admin.getPayoutBatches()
+      .then(setBatches)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
   const columns = [
     {
-      key: "created_at",
+      key: "batch_date",
       header: "Date",
-      render: (item: (typeof mockPayoutRuns)[0]) =>
-        new Date(item.created_at).toLocaleDateString(),
+      render: (item: AffiliatePayoutBatch) =>
+        new Date(item.batch_date).toLocaleDateString(),
     },
     {
-      key: "total_amount",
+      key: "total_amount_cents",
       header: "Total Amount",
-      render: (item: (typeof mockPayoutRuns)[0]) => (
+      render: (item: AffiliatePayoutBatch) => (
         <span className="font-semibold">
-          ${item.total_amount.toLocaleString()}
+          ${(item.total_amount_cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
         </span>
       ),
     },
     {
-      key: "affiliate_count",
+      key: "total_affiliates",
       header: "Affiliates",
-      render: (item: (typeof mockPayoutRuns)[0]) => item.affiliate_count,
+      render: (item: AffiliatePayoutBatch) => item.total_affiliates,
     },
     {
       key: "status",
       header: "Status",
-      render: (item: (typeof mockPayoutRuns)[0]) => (
+      render: (item: AffiliatePayoutBatch) => (
         <Badge
           variant={
             item.status === "completed"
@@ -48,14 +61,30 @@ export default function AdminAffiliatePayoutRuns() {
       ),
     },
     {
-      key: "completed_at",
-      header: "Completed",
-      render: (item: (typeof mockPayoutRuns)[0]) =>
-        item.completed_at
-          ? new Date(item.completed_at).toLocaleDateString()
+      key: "approved_at",
+      header: "Approved",
+      render: (item: AffiliatePayoutBatch) =>
+        item.approved_at
+          ? new Date(item.approved_at).toLocaleDateString()
           : "-",
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12 text-red-600">
+        Failed to load payout runs: {error}
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -72,7 +101,8 @@ export default function AdminAffiliatePayoutRuns() {
       </div>
       <DataTable
         columns={columns}
-        data={mockPayoutRuns}
+        data={batches}
+        emptyMessage="No payout runs yet."
       />
     </div>
   );

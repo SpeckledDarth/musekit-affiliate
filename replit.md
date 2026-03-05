@@ -9,7 +9,7 @@ This is the `@musekit/affiliate` package — a standalone affiliate/referral pro
 - **Framework**: Next.js 14.2.18 (App Router)
 - **UI**: React 18.3.1, Tailwind CSS 3.4.16
 - **Language**: TypeScript (strict mode)
-- **Database**: Supabase (currently using mock data)
+- **Database**: Supabase (real database integration via API routes)
 - **Payments**: Stripe (for commission tracking)
 - **Charts**: Recharts
 - **Icons**: Lucide React
@@ -20,13 +20,27 @@ This is the `@musekit/affiliate` package — a standalone affiliate/referral pro
 src/
 ├── app/                    # Next.js pages (App Router)
 │   ├── affiliate/          # Affiliate dashboard (11 pages)
-│   └── admin/affiliates/   # Admin panel (12 pages)
+│   ├── admin/affiliates/   # Admin panel (12 pages)
+│   └── api/                # API routes (server-side data access)
+│       ├── affiliate/      # Affiliate-facing API endpoints
+│       └── admin/affiliates/ # Admin API endpoints
 ├── components/ui/          # Shared UI components
 ├── core/                   # Business logic (tracking, commissions)
-├── lib/                    # Supabase client, mock data
+├── lib/                    # Supabase client, queries, mutations, API client
+│   ├── supabase.ts         # Supabase client initialization
+│   ├── queries.ts          # Read operations (server-side only)
+│   ├── mutations.ts        # Write operations (server-side only)
+│   └── api-client.ts       # Client-side API wrapper (fetch-based)
 ├── types/                  # TypeScript interfaces
 └── index.ts                # Package exports
 ```
+
+## Architecture
+
+- **Data access pattern**: All Supabase queries run server-side in Next.js API routes (`src/app/api/`). Client components use `src/lib/api-client.ts` to fetch data via HTTP. This avoids exposing Supabase keys to the browser.
+- **Server-side**: `src/lib/queries.ts` (reads) and `src/lib/mutations.ts` (writes) use Supabase service client
+- **Client-side**: `src/lib/api-client.ts` provides a typed `api` object that calls the API routes
+- **Amounts**: Stored in cents in the database (e.g., `commission_amount_cents`, `amount_cents`, `total_earnings_cents`)
 
 ## Running
 
@@ -74,8 +88,13 @@ All required secrets are configured:
 - `STRIPE_SECRET_KEY`
 - `NEXT_PUBLIC_APP_URL`
 
+## Database Tables
+
+Real Supabase tables: `referral_links`, `affiliate_referrals`, `affiliate_commissions`, `affiliate_payouts`, `affiliate_tiers`, `affiliate_milestones`, `affiliate_assets`, `affiliate_broadcasts`, `affiliate_messages`, `affiliate_applications`, `affiliate_contests`, `discount_codes`, `announcements`, `tickets`, `affiliate_payout_batches`, `affiliate_payout_items`, `profiles`.
+
 ## Notes
 
-- Currently uses mock data (see `src/lib/mock-data.ts`). Database tables are documented in `MODULE.md`.
 - UI components are self-contained in `src/components/ui/` until `@musekit/design-system` is available.
 - Core business logic is in `src/core/index.ts`.
+- DataTable component uses `any` types to avoid type incompatibility across different table schemas.
+- `frame-ancestors *` in next.config.js is intentional for Replit proxy iframe embedding.

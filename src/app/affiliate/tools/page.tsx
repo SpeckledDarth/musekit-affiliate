@@ -1,22 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy, Link, Code } from "lucide-react";
-import { mockAffiliate } from "@/lib/mock-data";
+import { api } from "@/lib/api-client";
 import { generateReferralLink } from "@/core";
+import type { ReferralLink } from "@/types";
 
 export default function AffiliateTools() {
   const [campaign, setCampaign] = useState("");
   const [generatedLink, setGeneratedLink] = useState("");
   const [copied, setCopied] = useState(false);
+  const [refCode, setRefCode] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const links = await api.affiliate.getReferralLinks();
+        if (links.length > 0) {
+          setRefCode(links[0].ref_code);
+        }
+      } catch (err) {
+        console.error("Failed to load referral data:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
   const handleGenerate = () => {
-    const link = generateReferralLink(
-      mockAffiliate.referral_code,
-      campaign || undefined,
-    );
+    if (!refCode) return;
+    const link = generateReferralLink(refCode, campaign || undefined);
     setGeneratedLink(link);
   };
 
@@ -26,7 +43,15 @@ export default function AffiliateTools() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const bannerCode = `<a href="${generatedLink || generateReferralLink(mockAffiliate.referral_code)}">
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+      </div>
+    );
+  }
+
+  const bannerCode = `<a href="${generatedLink || generateReferralLink(refCode || "")}">
   <img src="https://musekit.io/assets/banner-728x90.png" alt="MuseKit" width="728" height="90" />
 </a>`;
 
@@ -61,7 +86,9 @@ export default function AffiliateTools() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
               </div>
-              <Button onClick={handleGenerate}>Generate Link</Button>
+              <Button onClick={handleGenerate} disabled={!refCode}>
+                Generate Link
+              </Button>
               {generatedLink && (
                 <div className="flex items-center gap-2">
                   <input

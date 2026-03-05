@@ -1,45 +1,95 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/ui/data-table";
-import { mockReferrals } from "@/lib/mock-data";
+import { api } from "@/lib/api-client";
+import type { AffiliateReferral } from "@/types";
 
 export default function AffiliateReferrals() {
+  const [referrals, setReferrals] = useState<AffiliateReferral[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await api.affiliate.getReferrals();
+        setReferrals(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load data");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
   const columns = [
-    { key: "id", header: "ID" },
     {
-      key: "landing_page",
-      header: "Landing Page",
-      render: (item: (typeof mockReferrals)[0]) => (
+      key: "ref_code",
+      header: "Ref Code",
+      render: (item: AffiliateReferral) => (
         <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-          {item.landing_page}
+          {item.ref_code}
         </code>
       ),
     },
     {
-      key: "clicked_at",
-      header: "Clicked",
-      render: (item: (typeof mockReferrals)[0]) =>
-        new Date(item.clicked_at).toLocaleDateString(),
+      key: "created_at",
+      header: "Date",
+      render: (item: AffiliateReferral) =>
+        new Date(item.created_at).toLocaleDateString(),
     },
     {
-      key: "converted",
+      key: "status",
       header: "Status",
-      render: (item: (typeof mockReferrals)[0]) => (
-        <Badge variant={item.converted ? "success" : "default"}>
-          {item.converted ? "Converted" : "Clicked"}
+      render: (item: AffiliateReferral) => (
+        <Badge
+          variant={
+            item.status === "converted"
+              ? "success"
+              : item.status === "churned"
+                ? "danger"
+                : item.status === "fraud"
+                  ? "danger"
+                  : "warning"
+          }
+        >
+          {item.status}
         </Badge>
       ),
     },
     {
       key: "converted_at",
       header: "Converted At",
-      render: (item: (typeof mockReferrals)[0]) =>
+      render: (item: AffiliateReferral) =>
         item.converted_at
           ? new Date(item.converted_at).toLocaleDateString()
-          : "-",
+          : "—",
+    },
+    {
+      key: "source_tag",
+      header: "Source",
+      render: (item: AffiliateReferral) => item.source_tag || "—",
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-gray-500">Loading referrals...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-red-500">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -51,7 +101,8 @@ export default function AffiliateReferrals() {
       </div>
       <DataTable
         columns={columns}
-        data={mockReferrals}
+        data={referrals}
+        emptyMessage="No referrals yet"
       />
     </div>
   );

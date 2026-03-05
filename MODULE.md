@@ -8,6 +8,7 @@ This package provides a complete affiliate management system including:
 - Affiliate user dashboard (earnings, referrals, analytics, payouts, tools)
 - Admin panel (applications, members, tiers, contests, payouts, discount codes)
 - Core referral tracking and commission calculation logic
+- Real Supabase database integration via Next.js API routes
 
 ## Tech Stack
 
@@ -36,23 +37,45 @@ src/
 │   │   ├── settings/       # Account settings
 │   │   ├── support/        # Support tickets
 │   │   └── tools/          # Link generator, embed codes
-│   └── admin/affiliates/   # Admin panel
-│       ├── applications/   # Review/approve/reject
-│       ├── assets/         # Marketing asset management
-│       ├── broadcasts/     # Send announcements
-│       ├── contests/       # Promotional campaigns
-│       ├── discount-codes/ # Discount code management
-│       ├── members/        # Active affiliate list
-│       ├── milestones/     # Achievement definitions
-│       ├── networks/       # Network integrations
-│       ├── payout-runs/    # Batch payment processing
-│       ├── settings/       # Program configuration
-│       └── tiers/          # Commission tier management
+│   ├── admin/affiliates/   # Admin panel
+│   │   ├── applications/   # Review/approve/reject
+│   │   ├── assets/         # Marketing asset management
+│   │   ├── broadcasts/     # Send announcements
+│   │   ├── contests/       # Promotional campaigns
+│   │   ├── discount-codes/ # Discount code management
+│   │   ├── members/        # Active affiliate list
+│   │   ├── milestones/     # Achievement definitions
+│   │   ├── networks/       # Network integrations
+│   │   ├── payout-runs/    # Batch payment processing
+│   │   ├── settings/       # Program configuration
+│   │   └── tiers/          # Commission tier management
+│   └── api/                # Server-side API routes
+│       ├── affiliate/      # Affiliate-facing endpoints
+│       └── admin/affiliates/ # Admin endpoints
 ├── components/ui/          # Shared UI components
 ├── core/                   # Business logic
-├── lib/                    # Utilities (Supabase client, mock data)
+├── lib/                    # Data access layer
+│   ├── supabase.ts         # Supabase client (server-side)
+│   ├── queries.ts          # Read operations
+│   ├── mutations.ts        # Write operations
+│   └── api-client.ts       # Client-side API wrapper
 └── types/                  # TypeScript type definitions
 ```
+
+## Architecture
+
+### Data Flow
+1. Client components import `api` from `@/lib/api-client`
+2. `api` methods call Next.js API routes via fetch
+3. API routes import from `@/lib/queries` and `@/lib/mutations`
+4. Queries/mutations use Supabase service client (server-side only)
+
+This architecture ensures Supabase credentials never reach the browser.
+
+### Database Conventions
+- Monetary amounts stored in cents (e.g., `commission_amount_cents`, `amount_cents`, `total_earnings_cents`)
+- Client-side formatting converts cents to dollars for display
+- Referral links use `user_id` as join key
 
 ## Core Functions
 
@@ -63,172 +86,29 @@ src/
 - `generateReferralLink(affiliateId, campaign?)` — Create tracking URL
 - `validateReferralCode(code)` — Check if code is valid
 
-## Required Supabase Tables
+## Database Tables
 
-The following tables are needed but may not yet exist in the database.
-**Do NOT create these tables directly** — they should be managed through migrations.
+Real Supabase tables used by this module:
 
-### affiliates
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| user_id | uuid | FK to auth.users |
-| name | text | Affiliate name |
-| email | text | Contact email |
-| referral_code | text | Unique referral code |
-| tier | text | bronze/silver/gold/platinum |
-| status | text | pending/active/suspended/rejected |
-| commission_rate | numeric | Commission percentage |
-| total_earnings | numeric | Lifetime earnings |
-| pending_earnings | numeric | Unpaid earnings |
-| total_clicks | integer | Total referral clicks |
-| total_conversions | integer | Total conversions |
-| payment_method | text | Payment method preference |
-| payment_email | text | Payment email |
-| created_at | timestamptz | Created timestamp |
-| updated_at | timestamptz | Updated timestamp |
-
-### affiliate_referrals
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| affiliate_id | uuid | FK to affiliates |
-| visitor_id | text | Unique visitor identifier |
-| referral_code | text | Code used |
-| ip_address | inet | Visitor IP |
-| user_agent | text | Browser user agent |
-| landing_page | text | Landing page URL |
-| clicked_at | timestamptz | Click timestamp |
-| converted | boolean | Whether converted |
-| converted_at | timestamptz | Conversion timestamp |
-| converted_user_id | uuid | FK to auth.users |
-
-### affiliate_conversions
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| affiliate_id | uuid | FK to affiliates |
-| referral_id | uuid | FK to affiliate_referrals |
-| user_id | uuid | FK to auth.users |
-| sale_amount | numeric | Sale amount |
-| commission_amount | numeric | Commission earned |
-| status | text | pending/approved/rejected/paid |
-| created_at | timestamptz | Created timestamp |
-
-### affiliate_payouts
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| affiliate_id | uuid | FK to affiliates |
-| amount | numeric | Payout amount |
-| status | text | pending/processing/completed/failed |
-| payment_method | text | Payment method used |
-| transaction_id | text | External transaction ID |
-| processed_at | timestamptz | Processing timestamp |
-| created_at | timestamptz | Created timestamp |
-
-### affiliate_payout_runs
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| total_amount | numeric | Total payout amount |
-| affiliate_count | integer | Number of affiliates |
-| status | text | pending/processing/completed/failed |
-| processed_by | uuid | Admin who processed |
-| created_at | timestamptz | Created timestamp |
-| completed_at | timestamptz | Completion timestamp |
-
-### affiliate_tiers
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| name | text | Tier name |
-| slug | text | URL-safe slug |
-| commission_rate | numeric | Commission percentage |
-| min_sales | integer | Minimum sales required |
-| min_revenue | numeric | Minimum revenue required |
-| benefits | jsonb | Array of benefit strings |
-
-### affiliate_milestones
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| name | text | Milestone name |
-| description | text | Description |
-| requirement_type | text | sales/revenue/referrals |
-| requirement_value | numeric | Required amount |
-| reward_type | text | bonus/tier_upgrade/badge |
-| reward_value | text | Reward description |
-
-### affiliate_marketing_assets
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| name | text | Asset name |
-| type | text | banner/text/email/social |
-| content | text | Content or URL |
-| preview_url | text | Preview image URL |
-| dimensions | text | Dimensions (for banners) |
-| created_at | timestamptz | Created timestamp |
-
-### affiliate_discount_codes
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| code | text | Discount code |
-| affiliate_id | uuid | FK to affiliates (nullable) |
-| discount_type | text | percentage/fixed |
-| discount_value | numeric | Discount amount |
-| max_uses | integer | Max uses (nullable = unlimited) |
-| current_uses | integer | Current use count |
-| expires_at | timestamptz | Expiration (nullable = never) |
-| status | text | active/expired/disabled |
-| created_at | timestamptz | Created timestamp |
-
-### affiliate_contests
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| name | text | Contest name |
-| description | text | Description |
-| start_date | timestamptz | Start date |
-| end_date | timestamptz | End date |
-| prize_description | text | Prize details |
-| status | text | draft/active/ended |
-| metric | text | clicks/conversions/revenue |
-
-### affiliate_broadcasts
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| title | text | Broadcast title |
-| content | text | Broadcast content |
-| sent_by | uuid | FK to admin user |
-| sent_at | timestamptz | Sent timestamp |
-| recipient_count | integer | Number of recipients |
-
-### affiliate_messages
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| affiliate_id | uuid | FK to affiliates |
-| sender_type | text | affiliate/admin |
-| subject | text | Message subject |
-| content | text | Message body |
-| read | boolean | Read status |
-| created_at | timestamptz | Created timestamp |
-
-### affiliate_support_tickets
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| affiliate_id | uuid | FK to affiliates |
-| subject | text | Ticket subject |
-| description | text | Ticket description |
-| status | text | open/in_progress/resolved/closed |
-| priority | text | low/medium/high |
-| created_at | timestamptz | Created timestamp |
-| updated_at | timestamptz | Updated timestamp |
+| Table | Purpose |
+|-------|---------|
+| `referral_links` | Affiliate referral links and codes |
+| `affiliate_referrals` | Referral click/conversion tracking |
+| `affiliate_commissions` | Commission records |
+| `affiliate_payouts` | Individual payout records |
+| `affiliate_payout_batches` | Batch payout runs |
+| `affiliate_payout_items` | Items within a payout batch |
+| `affiliate_tiers` | Commission tier definitions |
+| `affiliate_milestones` | Achievement/milestone definitions |
+| `affiliate_assets` | Marketing materials |
+| `affiliate_broadcasts` | Admin announcements |
+| `affiliate_messages` | Affiliate-admin messaging |
+| `affiliate_applications` | Affiliate signup applications |
+| `affiliate_contests` | Promotional contest definitions |
+| `discount_codes` | Discount/coupon codes |
+| `announcements` | General announcements |
+| `tickets` | Support tickets |
+| `profiles` | User profile data |
 
 ## Environment Variables
 
@@ -246,4 +126,4 @@ When the MuseKit ecosystem packages are published:
 - `@musekit/design-system` — UI component library
 - `@musekit/billing` — Billing integration
 
-Currently using local UI components and mock data until these packages are available.
+Currently using local UI components until these packages are available.

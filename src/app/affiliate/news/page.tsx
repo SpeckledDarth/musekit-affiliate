@@ -1,10 +1,42 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Megaphone } from "lucide-react";
-import { mockBroadcasts } from "@/lib/mock-data";
+import { api } from "@/lib/api-client";
+import type { AffiliateBroadcast } from "@/types";
 
 export default function AffiliateNews() {
+  const [broadcasts, setBroadcasts] = useState<AffiliateBroadcast[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await api.affiliate.getBroadcasts();
+        setBroadcasts(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load broadcasts");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500">{error}</div>;
+  }
+
   return (
     <div>
       <div className="mb-8">
@@ -17,7 +49,10 @@ export default function AffiliateNews() {
       </div>
 
       <div className="space-y-4">
-        {mockBroadcasts.map((broadcast) => (
+        {broadcasts.length === 0 && (
+          <p className="text-gray-500 text-center py-8">No announcements yet.</p>
+        )}
+        {broadcasts.map((broadcast) => (
           <Card key={broadcast.id}>
             <CardContent className="py-6">
               <div className="flex gap-4">
@@ -26,17 +61,19 @@ export default function AffiliateNews() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">
-                    {broadcast.title}
+                    {broadcast.subject}
                   </h3>
                   <p className="text-sm text-gray-600 mt-1">
-                    {broadcast.content}
+                    {broadcast.body}
                   </p>
                   <p className="text-xs text-gray-400 mt-2">
-                    {new Date(broadcast.sent_at).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                    {broadcast.sent_at
+                      ? new Date(broadcast.sent_at).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "Draft"}
                   </p>
                 </div>
               </div>
