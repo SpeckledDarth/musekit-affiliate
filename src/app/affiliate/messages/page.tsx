@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { toast } from "@/components/ui/toast";
 import { Send, User, Shield, MessageSquare } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { relativeTime } from "@/lib/format";
+import { useRealtimeTable } from "@/hooks/use-realtime";
 import type { AffiliateMessage } from "@/types";
 
 export default function AffiliateMessages() {
@@ -21,7 +22,7 @@ export default function AffiliateMessages() {
   const [messageBody, setMessageBody] = useState("");
   const [sending, setSending] = useState(false);
 
-  async function loadMessages() {
+  const loadMessages = useCallback(async () => {
     try {
       const data = await api.affiliate.getMessages();
       setMessages(data);
@@ -30,11 +31,13 @@ export default function AffiliateMessages() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     loadMessages();
-  }, []);
+  }, [loadMessages]);
+
+  useRealtimeTable("affiliate_messages", loadMessages);
 
   async function handleSend() {
     if (!messageBody.trim()) return;

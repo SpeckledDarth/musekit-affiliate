@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/ui/data-table";
 import { Modal } from "@/components/ui/modal";
@@ -8,6 +8,7 @@ import { SkeletonTable } from "@/components/ui/loading-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { api } from "@/lib/api-client";
 import { formatDate, relativeTime } from "@/lib/format";
+import { useRealtimeTable } from "@/hooks/use-realtime";
 import type { AffiliateReferral } from "@/types";
 
 const statusBadgeVariant = (status: string) => {
@@ -28,19 +29,22 @@ export default function AffiliateReferrals() {
   const [error, setError] = useState<string | null>(null);
   const [selectedReferral, setSelectedReferral] = useState<AffiliateReferral | null>(null);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await api.affiliate.getReferrals();
-        setReferrals(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load data");
-      } finally {
-        setLoading(false);
-      }
+  const loadReferrals = useCallback(async () => {
+    try {
+      const data = await api.affiliate.getReferrals();
+      setReferrals(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load data");
+    } finally {
+      setLoading(false);
     }
-    load();
   }, []);
+
+  useEffect(() => {
+    loadReferrals();
+  }, [loadReferrals]);
+
+  useRealtimeTable("affiliate_referrals", loadReferrals);
 
   const columns = [
     {
@@ -146,6 +150,9 @@ export default function AffiliateReferrals() {
         ]}
         onRowClick={(item: AffiliateReferral) => setSelectedReferral(item)}
         emptyMessage="No referrals match your filters"
+        exportable
+        exportFilename="my-referrals"
+        urlPersist
       />
 
       <Modal

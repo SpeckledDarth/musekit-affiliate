@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
@@ -8,6 +8,7 @@ import { Check, X, FileText } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
 import { toast } from "sonner";
+import { useRealtimeTable } from "@/hooks/use-realtime";
 import type { AffiliateApplication } from "@/types";
 
 const statusBadgeVariant: Record<string, "warning" | "success" | "danger"> = {
@@ -22,19 +23,22 @@ export default function AffiliateApplications() {
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await api.admin.getApplications();
-        setApplications(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load applications");
-      } finally {
-        setLoading(false);
-      }
+  const loadApplications = useCallback(async () => {
+    try {
+      const data = await api.admin.getApplications();
+      setApplications(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load applications");
+    } finally {
+      setLoading(false);
     }
-    load();
   }, []);
+
+  useEffect(() => {
+    loadApplications();
+  }, [loadApplications]);
+
+  useRealtimeTable("affiliate_applications", loadApplications);
 
   async function handleAction(id: string, status: "approved" | "rejected") {
     setActionLoading(id);
@@ -158,6 +162,9 @@ export default function AffiliateApplications() {
         emptyMessage="No applications found"
         emptyIcon={<FileText className="w-8 h-8 text-gray-400" />}
         title="Applications"
+        exportable
+        exportFilename="affiliate-applications"
+        urlPersist
       />
     </div>
   );

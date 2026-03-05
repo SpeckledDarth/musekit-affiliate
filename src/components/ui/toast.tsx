@@ -10,11 +10,8 @@ export function ToastProvider() {
       position="top-right"
       toastOptions={{
         duration: 4000,
-        style: {
-          background: "white",
-          border: "1px solid #e5e7eb",
-          borderRadius: "0.75rem",
-          boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+        classNames: {
+          toast: "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg text-gray-900 dark:text-gray-100",
         },
       }}
     />

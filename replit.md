@@ -26,31 +26,37 @@ src/
 │   └── api/                # API routes (server-side data access)
 │       ├── affiliate/      # Affiliate-facing API endpoints
 │       └── admin/affiliates/ # Admin API endpoints
-├── components/ui/          # Shared UI components (15 components)
-│   ├── badge.tsx           # Status badges
+├── components/ui/          # Shared UI components (17 components)
+│   ├── badge.tsx           # Status badges (dark mode variants per color)
 │   ├── button.tsx          # Primary/secondary/ghost buttons
 │   ├── card.tsx            # Card container
 │   ├── confirm-dialog.tsx  # Delete/action confirmation modal
-│   ├── data-table.tsx      # Full-featured DataTable (sort/search/filter/paginate/select)
+│   ├── data-table.tsx      # Full-featured DataTable (sort/search/filter/paginate/select/export/url-persist)
 │   ├── empty-state.tsx     # Empty state with icon, message, optional action
 │   ├── input.tsx           # Form input with label, error state, icon
 │   ├── loading-skeleton.tsx # Skeleton loaders (line, card, table)
 │   ├── modal.tsx           # Modal dialog with overlay, body scroll lock
 │   ├── search-input.tsx    # Debounced search input with clear button
 │   ├── select.tsx          # Select dropdown with label
+│   ├── sidebar.tsx         # Navigation sidebar with theme toggle
 │   ├── stat-card.tsx       # Metric display card
 │   ├── tabs.tsx            # Tab switcher for detail views
 │   ├── textarea.tsx        # Multi-line input with label
+│   ├── theme-provider.tsx  # Theme context (light/dark/system), persists to localStorage
+│   ├── theme-toggle.tsx    # Theme toggle button (Sun/Moon/Monitor icons)
 │   └── toast.tsx           # Toast provider (Sonner) + toast helper
 ├── core/                   # Business logic (tracking, commissions)
 ├── hooks/                  # Custom React hooks
 │   ├── use-debounce.ts     # Debounce hook for search inputs
-│   └── use-unsaved-changes.ts # Warn on navigating away from dirty forms
+│   ├── use-realtime.ts     # Supabase Realtime subscription hook
+│   ├── use-unsaved-changes.ts # Warn on navigating away from dirty forms
+│   └── use-url-filters.ts  # URL search params sync hook (standalone)
 ├── lib/                    # Supabase client, queries, mutations, API client
-│   ├── supabase.ts         # Supabase client initialization
+│   ├── supabase.ts         # Supabase client initialization (NEXT_PUBLIC_ keys, works client-side)
 │   ├── queries.ts          # Read operations (server-side only)
 │   ├── mutations.ts        # Write operations (server-side only)
 │   ├── api-client.ts       # Client-side API wrapper (fetch-based, full CRUD)
+│   ├── csv-export.ts       # CSV export utility (Blob download)
 │   └── format.ts           # Formatting utilities (formatCents, formatDate, relativeTime, etc.)
 ├── types/                  # TypeScript interfaces
 ├── dashboard/index.ts      # Barrel exports for affiliate dashboard pages
@@ -64,6 +70,10 @@ src/
 - **Server-side**: `src/lib/queries.ts` (reads) and `src/lib/mutations.ts` (writes) use Supabase service client
 - **Client-side**: `src/lib/api-client.ts` provides a typed `api` object with full CRUD for all entities (GET, POST, PUT, DELETE)
 - **Amounts**: Stored in cents in the database (e.g., `commission_amount_cents`, `amount_cents`, `total_earnings_cents`). Use `formatCents()` from `src/lib/format.ts` to display.
+- **Dark mode**: Uses `darkMode: 'class'` in Tailwind config. ThemeProvider wraps the app in root layout. Theme persists to localStorage key `musekit-theme`. ThemeToggle button at bottom of both sidebars.
+- **Supabase Realtime**: `useRealtimeTable` hook subscribes to postgres_changes. Used on referrals, messages, earnings, and applications pages for auto-refresh.
+- **CSV export**: DataTable supports `exportable` and `exportFilename` props. Exports filtered/sorted data (pre-pagination) as .csv download.
+- **URL-persisted filters**: DataTable supports `urlPersist` prop. Syncs search, filters, and page to URL query params for shareable/bookmarkable states.
 
 ## DataTable Component
 
@@ -75,6 +85,8 @@ The `DataTable` component (`src/components/ui/data-table.tsx`) is the core table
 - **Row click**: Optional `onRowClick` for navigation to detail views
 - **Checkbox selection**: Optional `selectable` prop for bulk actions
 - **Loading/empty states**: Skeleton rows when loading, EmptyState when no data
+- **CSV export**: Optional `exportable` + `exportFilename` props, "Download CSV" button in toolbar
+- **URL persistence**: Optional `urlPersist` prop syncs search/filters/page to URL params
 
 ## Running
 
@@ -148,32 +160,9 @@ Real Supabase tables: `referral_links`, `affiliate_referrals`, `affiliate_commis
 ## Development Phases
 
 - **Phase 1 (Foundation)**: COMPLETED — UI components, DataTable overhaul, barrel exports, CRUD API routes, hooks, format utilities
-- **Phase 2 (Affiliate Portal)**: COMPLETED — All 11 affiliate pages fully functional:
-  - Dashboard: Skeleton loading, formatCents/formatDate utilities
-  - Analytics: Date range selector (7d/30d/90d/All Time), dynamic chart filtering
-  - Referrals: DataTable with search, status filter, row-click detail modal
-  - Earnings: DataTable with search, status filter, formatCents for all amounts
-  - Payouts: DataTable with search, status/method filters, row-click detail modal
-  - Resources: Working Copy/Download buttons, search, asset type tabs, toast feedback
-  - Tools: QR code generation (qrcode.react), download as PNG, toast copy feedback
-  - News: Click-to-detail modal with full broadcast info, formatDate
-  - Messages: New Message modal with send, mark-as-read, relativeTime, EmptyState
-  - Support: New Ticket modal (subject/description/priority/category), DataTable with search/filters, detail modal
-  - Settings: Toast feedback (replacing inline messages), Input/Select components, useUnsavedChanges hook
-- **Phase 3 (Admin Panel)**: COMPLETED — All 12 admin pages fully functional:
-  - Overview: Skeleton loading, formatCents for stats
-  - Applications: DataTable with search/status filter, approve/reject with toast
-  - Members: DataTable with search, role/status filters, row-click detail modal, formatCents
-  - Settings: Controlled form inputs (Input component), toast on save
-  - Assets: Full CRUD (Add/Edit/Delete), DataTable with search+type filter, ConfirmDialog, toast
-  - Milestones: Full CRUD (Add/Edit/Delete modals), ConfirmDialog, formatCents, toast
-  - Tiers: Full CRUD (Add/Edit/Delete modals), ConfirmDialog, formatCents, toast
-  - Broadcasts: Create modal, delete with ConfirmDialog, search, formatDate, toast
-  - Networks: Toast feedback on Connect/Manage, external link support
-  - Contests: Full CRUD (Add/Edit/Delete modals), ConfirmDialog, formatDate/formatCents, toast
-  - Payout Runs: Create modal, DataTable with search+status filter, formatCents/formatDate, toast
-  - Discount Codes: Create modal, ConfirmDialog delete, DataTable with search+status/type filters, formatDate, toast
-- **Phase 4 (Polish)**: Dark mode, toasts on all mutations, CSV export, Realtime subscriptions, URL-persisted filters
+- **Phase 2 (Affiliate Portal)**: COMPLETED — All 11 affiliate pages fully functional
+- **Phase 3 (Admin Panel)**: COMPLETED — All 12 admin pages fully functional
+- **Phase 4 (Polish)**: COMPLETED — Dark mode (all components + theme toggle), CSV export (8 pages), Supabase Realtime (4 pages), URL-persisted filters (6 pages)
 
 ## Notes
 
@@ -182,3 +171,4 @@ Real Supabase tables: `referral_links`, `affiliate_referrals`, `affiliate_commis
 - DataTable component uses `any` types to avoid type incompatibility across different table schemas.
 - `frame-ancestors *` in next.config.js is intentional for Replit proxy iframe embedding.
 - ToastProvider (Sonner) is mounted in the root layout for app-wide toast notifications.
+- ThemeToggle is placed at the bottom of the Sidebar component, visible on both admin and affiliate layouts.

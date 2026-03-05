@@ -143,6 +143,8 @@ export default function AdminAffiliatePayoutRuns() {
         emptyMessage="No payout runs yet."
         searchable
         searchPlaceholder="Search payout runs..."
+        exportable
+        exportFilename="payout-runs"
         filters={[
           {
             key: "status",

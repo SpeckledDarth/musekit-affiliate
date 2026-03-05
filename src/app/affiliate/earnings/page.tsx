@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/ui/data-table";
 import { StatCard } from "@/components/ui/stat-card";
@@ -8,6 +8,7 @@ import { SkeletonTable } from "@/components/ui/loading-skeleton";
 import { DollarSign, TrendingUp, Clock } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { formatCents, formatDate } from "@/lib/format";
+import { useRealtimeTable } from "@/hooks/use-realtime";
 import type { AffiliateCommission, AffiliateStats } from "@/types";
 
 export default function AffiliateEarnings() {
@@ -16,23 +17,26 @@ export default function AffiliateEarnings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const [c, s] = await Promise.all([
-          api.affiliate.getCommissions(),
-          api.affiliate.getStats(),
-        ]);
-        setCommissions(c);
-        setStats(s);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load data");
-      } finally {
-        setLoading(false);
-      }
+  const loadEarnings = useCallback(async () => {
+    try {
+      const [c, s] = await Promise.all([
+        api.affiliate.getCommissions(),
+        api.affiliate.getStats(),
+      ]);
+      setCommissions(c);
+      setStats(s);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load data");
+    } finally {
+      setLoading(false);
     }
-    load();
   }, []);
+
+  useEffect(() => {
+    loadEarnings();
+  }, [loadEarnings]);
+
+  useRealtimeTable("affiliate_commissions", loadEarnings);
 
   const columns = [
     {
@@ -155,6 +159,9 @@ export default function AffiliateEarnings() {
         searchable={true}
         searchPlaceholder="Search commissions..."
         filters={statusFilter}
+        exportable
+        exportFilename="my-earnings"
+        urlPersist
       />
     </div>
   );

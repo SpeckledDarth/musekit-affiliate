@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, Suspense } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Card } from "./card";
 import { SearchInput } from "./search-input";
 import { EmptyState } from "./empty-state";
-import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { exportToCSV } from "@/lib/csv-export";
 import { clsx } from "clsx";
 
 interface Column {
@@ -42,11 +44,14 @@ interface DataTableProps {
   loading?: boolean;
   title?: string;
   headerActions?: React.ReactNode;
+  exportable?: boolean;
+  exportFilename?: string;
+  urlPersist?: boolean;
 }
 
 type SortDirection = "asc" | "desc" | null;
 
-export function DataTable({
+function DataTableInner({
   columns,
   data,
   emptyMessage = "No data available",
@@ -63,13 +68,50 @@ export function DataTable({
   loading = false,
   title,
   headerActions,
+  exportable = false,
+  exportFilename = "export",
+  urlPersist = false,
 }: DataTableProps) {
-  const [search, setSearch] = useState("");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [localSearch, setLocalSearch] = useState("");
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDirection>(null);
-  const [filterValues, setFilterValues] = useState<Record<string, string>>({});
-  const [page, setPage] = useState(1);
+  const [localFilterValues, setLocalFilterValues] = useState<Record<string, string>>({});
+  const [localPage, setLocalPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+
+  const updateURL = useCallback(
+    (updates: Record<string, string | null>) => {
+      if (!urlPersist) return;
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === null || value === "") {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
+      }
+      const qs = params.toString();
+      router.replace(`${pathname}${qs ? `?${qs}` : ""}`, { scroll: false });
+    },
+    [urlPersist, searchParams, router, pathname],
+  );
+
+  const search = urlPersist ? (searchParams.get("q") ?? "") : localSearch;
+  const page = urlPersist ? (parseInt(searchParams.get("page") ?? "1", 10) || 1) : localPage;
+
+  const filterValues = useMemo(() => {
+    if (!urlPersist) return localFilterValues;
+    const result: Record<string, string> = {};
+    filters.forEach((f) => {
+      const v = searchParams.get(f.key);
+      if (v) result[f.key] = v;
+    });
+    return result;
+  }, [urlPersist, searchParams, localFilterValues, filters]);
 
   const handleSort = useCallback((key: string) => {
     setSortKey((prev) => {
@@ -84,18 +126,40 @@ export function DataTable({
       setSortDir("asc");
       return key;
     });
-    setPage(1);
-  }, []);
+    if (urlPersist) {
+      updateURL({ page: null });
+    } else {
+      setLocalPage(1);
+    }
+  }, [urlPersist, updateURL]);
 
   const handleFilter = useCallback((key: string, value: string) => {
-    setFilterValues((prev) => ({ ...prev, [key]: value }));
-    setPage(1);
-  }, []);
+    if (urlPersist) {
+      updateURL({ [key]: value === "all" ? null : value, page: null });
+    } else {
+      setLocalFilterValues((prev) => ({ ...prev, [key]: value }));
+      setLocalPage(1);
+    }
+  }, [urlPersist, updateURL]);
 
   const handleSearch = useCallback((value: string) => {
-    setSearch(value);
-    setPage(1);
-  }, []);
+    if (urlPersist) {
+      updateURL({ q: value || null, page: null });
+    } else {
+      setLocalSearch(value);
+      setLocalPage(1);
+    }
+  }, [urlPersist, updateURL]);
+
+  const handleSetPage = useCallback((updater: number | ((prev: number) => number)) => {
+    if (urlPersist) {
+      const currentPage = parseInt(searchParams.get("page") ?? "1", 10) || 1;
+      const next = typeof updater === "function" ? updater(currentPage) : updater;
+      updateURL({ page: next <= 1 ? null : String(next) });
+    } else {
+      setLocalPage(updater);
+    }
+  }, [urlPersist, updateURL, searchParams]);
 
   const processedData = useMemo(() => {
     let result = [...data];
@@ -173,7 +237,15 @@ export function DataTable({
     });
   }, [processedData, onSelectionChange]);
 
-  const showToolbar = searchable || filters.length > 0 || title || headerActions;
+  const handleExport = useCallback(() => {
+    exportToCSV(
+      columns.map((col) => ({ key: col.key, header: col.header })),
+      processedData,
+      exportFilename,
+    );
+  }, [columns, processedData, exportFilename]);
+
+  const showToolbar = searchable || filters.length > 0 || title || headerActions || exportable;
 
   const renderSortIcon = (col: Column) => {
     if (col.sortable === false) return null;
@@ -191,7 +263,7 @@ export function DataTable({
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="animate-pulse flex gap-4">
               {columns.map((_, j) => (
-                <div key={j} className="h-4 bg-gray-200 rounded flex-1" />
+                <div key={j} className="h-4 bg-gray-200 dark:bg-gray-700 rounded flex-1" />
               ))}
             </div>
           ))}
@@ -203,13 +275,13 @@ export function DataTable({
   return (
     <Card className="overflow-hidden">
       {showToolbar && (
-        <div className="px-6 py-4 border-b border-gray-100 space-y-3">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 space-y-3">
           {(title || headerActions) && (
             <div className="flex items-center justify-between">
               {title && (
-                <h3 className="text-sm font-semibold text-gray-900">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                   {title}
-                  <span className="ml-2 text-xs font-normal text-gray-500">
+                  <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
                     ({processedData.length} {processedData.length === 1 ? "record" : "records"})
                   </span>
                 </h3>
@@ -232,7 +304,7 @@ export function DataTable({
                 key={filter.key}
                 value={filterValues[filter.key] || "all"}
                 onChange={(e) => handleFilter(filter.key, e.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
               >
                 <option value="all">{filter.label}: All</option>
                 {filter.options.map((opt) => (
@@ -242,6 +314,15 @@ export function DataTable({
                 ))}
               </select>
             ))}
+            {exportable && (
+              <button
+                onClick={handleExport}
+                className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                <Download className="w-4 h-4" />
+                Download CSV
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -249,7 +330,7 @@ export function DataTable({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
+            <tr className="border-b border-gray-200 bg-gray-50 dark:bg-gray-900/50 dark:border-gray-700">
               {selectable && (
                 <th className="px-6 py-3 w-10">
                   <input
@@ -266,8 +347,8 @@ export function DataTable({
                   <th
                     key={col.key}
                     className={clsx(
-                      "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider",
-                      isSortable && "cursor-pointer select-none hover:text-gray-700",
+                      "px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
+                      isSortable && "cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-300",
                     )}
                     onClick={isSortable ? () => handleSort(col.key) : undefined}
                   >
@@ -278,7 +359,7 @@ export function DataTable({
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {paginatedData.length === 0 ? (
               <tr>
                 <td colSpan={columns.length + (selectable ? 1 : 0)}>
@@ -297,9 +378,9 @@ export function DataTable({
                   <tr
                     key={localIndex}
                     className={clsx(
-                      "hover:bg-gray-50 transition-colors",
+                      "hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors",
                       onRowClick && "cursor-pointer",
-                      selectedIds.has(globalIndex) && "bg-primary-50",
+                      selectedIds.has(globalIndex) && "bg-primary-50 dark:bg-primary-900/30",
                     )}
                     onClick={() => onRowClick?.(item)}
                   >
@@ -316,7 +397,7 @@ export function DataTable({
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"
+                        className="px-6 py-4 text-sm text-gray-900 dark:text-gray-200 whitespace-nowrap"
                       >
                         {col.render
                           ? col.render(item)
@@ -332,27 +413,27 @@ export function DataTable({
       </div>
 
       {processedData.length > pageSize && (
-        <div className="px-6 py-3 border-t border-gray-100 flex items-center justify-between">
-          <p className="text-sm text-gray-500">
+        <div className="px-6 py-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Showing {(page - 1) * pageSize + 1}–
             {Math.min(page * pageSize, processedData.length)} of{" "}
             {processedData.length}
           </p>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              onClick={() => handleSetPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="p-1.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-sm text-gray-600 px-2">
+            <span className="text-sm text-gray-600 dark:text-gray-400 px-2">
               Page {page} of {totalPages}
             </span>
             <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              onClick={() => handleSetPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
-              className="p-1.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -360,5 +441,25 @@ export function DataTable({
         </div>
       )}
     </Card>
+  );
+}
+
+export function DataTable(props: DataTableProps) {
+  return (
+    <Suspense fallback={
+      <Card className="overflow-hidden">
+        <div className="p-6 space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="animate-pulse flex gap-4">
+              {props.columns.map((_, j) => (
+                <div key={j} className="h-4 bg-gray-200 dark:bg-gray-700 rounded flex-1" />
+              ))}
+            </div>
+          ))}
+        </div>
+      </Card>
+    }>
+      <DataTableInner {...props} />
+    </Suspense>
   );
 }

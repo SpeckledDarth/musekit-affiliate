@@ -10,7 +10,7 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={clsx(
-        "animate-pulse rounded bg-gray-200",
+        "animate-pulse rounded bg-gray-200 dark:bg-gray-700",
         className,
       )}
     />
@@ -23,7 +23,7 @@ export function SkeletonLine({ className }: SkeletonProps) {
 
 export function SkeletonCard() {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-4">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 space-y-4">
       <Skeleton className="h-5 w-1/3" />
       <Skeleton className="h-4 w-full" />
       <Skeleton className="h-4 w-2/3" />
@@ -34,7 +34,7 @@ export function SkeletonCard() {
 
 export function SkeletonTableRow({ columns = 5 }: { columns?: number }) {
   return (
-    <tr className="border-b border-gray-100">
+    <tr className="border-b border-gray-100 dark:border-gray-700">
       {Array.from({ length: columns }).map((_, i) => (
         <td key={i} className="px-6 py-4">
           <Skeleton className="h-4 w-full" />
@@ -52,8 +52,8 @@ export function SkeletonTable({
   columns?: number;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="border-b border-gray-200 bg-gray-50 px-6 py-3 flex gap-8">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+      <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 px-6 py-3 flex gap-8">
         {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={i} className="h-3 w-20" />
         ))}

@@ -160,6 +160,8 @@ export default function AffiliateSupport() {
         ]}
         onRowClick={(item) => setDetailTicket(item)}
         emptyMessage="No support tickets yet."
+        exportable
+        exportFilename="support-tickets"
       />
 
       <Modal

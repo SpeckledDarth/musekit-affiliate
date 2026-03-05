@@ -20,10 +20,10 @@ export function StatCard({
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-gray-500">{label}</span>
-        {Icon && <Icon className="w-5 h-5 text-gray-400" />}
+        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{label}</span>
+        {Icon && <Icon className="w-5 h-5 text-gray-400 dark:text-gray-500" />}
       </div>
-      <div className="text-2xl font-bold text-gray-900">{value}</div>
+      <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
       {change && (
         <p
           className={clsx(

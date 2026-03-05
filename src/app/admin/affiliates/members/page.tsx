@@ -125,6 +125,9 @@ export default function AffiliateMembers() {
         filters={filters}
         onRowClick={(item: AffiliateListItem) => setDetailMember(item)}
         emptyMessage="No affiliate members found"
+        exportable
+        exportFilename="affiliate-members"
+        urlPersist
       />
 
       <Modal

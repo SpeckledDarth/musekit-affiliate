@@ -51,12 +51,12 @@ export function ConfirmDialog({
       <div className="flex gap-4">
         {variant === "danger" && (
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
           </div>
         )}
-        <p className="text-sm text-gray-600">{message}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300">{message}</p>
       </div>
     </Modal>
   );

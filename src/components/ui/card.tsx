@@ -9,7 +9,7 @@ export function Card({ children, className }: CardProps) {
   return (
     <div
       className={clsx(
-        "bg-white rounded-xl border border-gray-200 shadow-sm",
+        "bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm",
         className,
       )}
     >
@@ -20,7 +20,7 @@ export function Card({ children, className }: CardProps) {
 
 export function CardHeader({ children, className }: CardProps) {
   return (
-    <div className={clsx("px-6 py-4 border-b border-gray-100", className)}>
+    <div className={clsx("px-6 py-4 border-b border-gray-100 dark:border-gray-700", className)}>
       {children}
     </div>
   );
@@ -38,7 +38,7 @@ export function CardTitle({
   className?: string;
 }) {
   return (
-    <h3 className={clsx("text-lg font-semibold text-gray-900", className)}>
+    <h3 className={clsx("text-lg font-semibold text-gray-900 dark:text-white", className)}>
       {children}
     </h3>
   );

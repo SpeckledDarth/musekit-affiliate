@@ -226,6 +226,9 @@ export default function AdminAffiliateDiscountCodes() {
         searchPlaceholder="Search codes..."
         filters={filters}
         emptyMessage="No discount codes yet."
+        exportable
+        exportFilename="discount-codes"
+        urlPersist
       />
 
       <Modal

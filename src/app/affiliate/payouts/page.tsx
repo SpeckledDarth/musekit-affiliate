@@ -134,6 +134,9 @@ export default function AffiliatePayouts() {
         searchPlaceholder="Search payouts..."
         filters={filters}
         onRowClick={(item: AffiliatePayout) => setSelected(item)}
+        exportable
+        exportFilename="my-payouts"
+        urlPersist
       />
 
       <Modal
