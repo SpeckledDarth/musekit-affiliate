@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Modal } from "@/components/ui/modal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Input } from "@/components/ui/input";
-import { Plus, Image, FileText, Share2, Mail, Pencil, Trash2 } from "lucide-react";
+import { Plus, Image, FileText, Share2, Mail, Pencil, Trash2, Upload, Loader2 } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
 import { toast } from "sonner";
@@ -47,6 +47,8 @@ export default function AdminAffiliateAssets() {
 
   const [deleteTarget, setDeleteTarget] = useState<AffiliateAsset | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function load() {
@@ -78,6 +80,24 @@ export default function AdminAffiliateAssets() {
       file_url: item.file_url || "",
     });
     setShowModal(true);
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const result = await api.admin.uploadFile(file);
+      setForm((f) => ({ ...f, file_url: result.url }));
+      toast.success(`File "${result.file_name}" uploaded successfully`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "File upload failed");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
   }
 
   async function handleSave() {
@@ -282,8 +302,47 @@ export default function AdminAffiliateAssets() {
             onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
             placeholder="Text content or embed code"
           />
+          <div className="w-full">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              File Upload
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.pdf"
+                onChange={handleFileUpload}
+                disabled={uploading}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choose File
+                  </>
+                )}
+              </Button>
+              {form.file_url && (
+                <span className="text-sm text-green-600 truncate max-w-[200px]">
+                  File uploaded
+                </span>
+              )}
+            </div>
+          </div>
           <Input
-            label="File URL"
+            label="Or enter File URL manually"
             value={form.file_url}
             onChange={(e) => setForm((f) => ({ ...f, file_url: e.target.value }))}
             placeholder="https://..."

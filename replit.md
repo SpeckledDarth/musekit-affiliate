@@ -164,6 +164,40 @@ Real Supabase tables: `referral_links`, `affiliate_referrals`, `affiliate_commis
 - **Phase 3 (Admin Panel)**: COMPLETED — All 12 admin pages fully functional
 - **Phase 4 (Polish)**: COMPLETED — Dark mode (all components + theme toggle), CSV export (8 pages), Supabase Realtime (4 pages), URL-persisted filters (6 pages)
 
+## Authentication & Authorization
+
+- **Auth helper**: `src/lib/auth.ts` provides `requireAffiliate(request)` and `requireAdmin(request)` helpers
+- **Bearer token auth**: Reads `Authorization: Bearer <token>` header, validates via Supabase `auth.getUser()`
+- **Dev fallback**: In development mode, if no Bearer token is present, falls back to first affiliate user in DB
+- **Admin RBAC**: Checks `profiles.role === 'admin'` via service client. Dev mode skips role check
+- **Pattern**: Every API route starts with `const auth = await requireAffiliate(request); if (auth.error) return auth.error;`
+- **Error handling**: All API routes wrapped in try/catch, return 500 with logged error on failure
+
+## File Upload
+
+- Upload endpoint at `/api/admin/affiliates/upload` (POST, multipart form data)
+- Validates file type (images, PDFs) and size (max 10MB)
+- Stores files in Supabase Storage bucket `affiliate-assets`
+- Admin assets page supports file upload with loading state
+
+## Ticket Replies
+
+- `TicketReply` type in `src/types/index.ts`: id, ticket_id, user_id, sender_role, body, created_at
+- Support tickets route handles `add_reply` and `get_replies` actions
+- Affiliate support page shows reply thread in ticket detail modal
+
+## Admin Settings
+
+- Settings stored in `affiliate_settings` table (single-row upsert pattern)
+- API route at `/api/admin/affiliates/settings` (GET/POST with admin auth)
+- Settings page loads from DB on mount, saves via API
+
+## Package Exports
+
+- `package.json` has `main`, `types`, and `exports` fields configured
+- Barrel exports: `src/components/ui/index.ts`, `src/hooks/index.ts`
+- Networks config extracted to `src/lib/networks-config.ts`
+
 ## Notes
 
 - UI components are self-contained in `src/components/ui/` until `@musekit/design-system` is available.

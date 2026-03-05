@@ -61,6 +61,7 @@ import type {
   DiscountCode,
   Announcement,
   SupportTicket,
+  TicketReply,
   AffiliateStats,
   AdminOverview,
   AffiliateListItem,
@@ -100,12 +101,20 @@ export const api = {
       postApi<SupportTicket>("/api/affiliate/support-tickets", ticket),
     updateTicketStatus: (id: string, status: string) =>
       postApi<SupportTicket>("/api/affiliate/support-tickets", { action: "update_status", id, status }),
+    getTicketReplies: (ticketId: string) =>
+      fetchApi<TicketReply[]>(`/api/affiliate/support-tickets?ticket_id=${ticketId}`),
+    addTicketReply: (ticketId: string, body: string) =>
+      postApi<TicketReply>("/api/affiliate/support-tickets", { action: "add_reply", ticket_id: ticketId, body }),
     getTiers: () =>
       fetchApi<AffiliateTier[]>("/api/affiliate/tiers"),
     getMilestones: () =>
       fetchApi<AffiliateMilestone[]>("/api/affiliate/milestones"),
   },
   admin: {
+    getSettings: () =>
+      fetchApi<Record<string, unknown>>("/api/admin/affiliates/settings"),
+    updateSettings: (data: Record<string, unknown>) =>
+      postApi<Record<string, unknown>>("/api/admin/affiliates/settings", data),
     getOverview: () =>
       fetchApi<AdminOverview>("/api/admin/affiliates/overview"),
     getAffiliateList: () =>
@@ -150,6 +159,19 @@ export const api = {
       putApi<AffiliateAsset>("/api/admin/affiliates/assets", { id, ...updates }),
     deleteAsset: (id: string) =>
       deleteApi<{ success: boolean }>(`/api/admin/affiliates/assets?id=${id}`),
+    uploadFile: async (file: File): Promise<{ url: string; file_name: string; file_size: number; file_type: string }> => {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`${BASE}/api/admin/affiliates/upload`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || res.statusText);
+      }
+      return res.json();
+    },
     getTiers: () =>
       fetchApi<AffiliateTier[]>("/api/admin/affiliates/tiers"),
     createTier: (data: { name: string; min_referrals: number; commission_rate: number; min_payout_cents?: number; perks?: string[]; sort_order?: number }) =>

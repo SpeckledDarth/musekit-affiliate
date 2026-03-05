@@ -265,6 +265,15 @@ export interface SupportTicket {
   closed_at: string | null;
 }
 
+export interface TicketReply {
+  id: string;
+  ticket_id: string;
+  user_id: string;
+  sender_role: "affiliate" | "admin";
+  body: string;
+  created_at: string;
+}
+
 export interface Profile {
   id: string;
   email: string;

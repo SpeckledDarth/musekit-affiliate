@@ -193,6 +193,16 @@ export async function getSupportTickets(
   return data || [];
 }
 
+export async function getTicketReplies(ticketId: string): Promise<import("@/types").TicketReply[]> {
+  const { data, error } = await supabase
+    .from("ticket_replies")
+    .select("*")
+    .eq("ticket_id", ticketId)
+    .order("created_at", { ascending: true });
+  if (error) return [];
+  return data || [];
+}
+
 export async function getTiers(): Promise<AffiliateTier[]> {
   const { data, error } = await supabase
     .from("affiliate_tiers")
@@ -354,4 +364,24 @@ export async function getFirstAffiliateUserId(): Promise<string | null> {
     .limit(1)
     .single();
   return data?.user_id || null;
+}
+
+export async function getAffiliateSettings() {
+  const sb = getServiceClient();
+  const { data, error } = await sb
+    .from("affiliate_settings")
+    .select("*")
+    .limit(1)
+    .single();
+  if (error || !data) {
+    return {
+      commission_rate: 15,
+      cookie_duration: 30,
+      min_payout_amount: 50,
+      payout_schedule: "monthly",
+      auto_approve: false,
+      require_email_verification: true,
+    };
+  }
+  return data;
 }

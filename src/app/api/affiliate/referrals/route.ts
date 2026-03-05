@@ -1,9 +1,15 @@
-import { NextResponse } from "next/server";
-import { getReferrals, getFirstAffiliateUserId } from "@/lib/queries";
+import { NextRequest, NextResponse } from "next/server";
+import { getReferrals } from "@/lib/queries";
+import { requireAffiliate } from "@/lib/auth";
 
-export async function GET() {
-  const userId = await getFirstAffiliateUserId();
-  if (!userId) return NextResponse.json([]);
-  const data = await getReferrals(userId);
-  return NextResponse.json(data);
+export async function GET(request: NextRequest) {
+  try {
+    const auth = await requireAffiliate(request);
+    if (auth.error) return auth.error;
+    const data = await getReferrals(auth.userId);
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("GET /api/affiliate/referrals error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

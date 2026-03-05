@@ -398,6 +398,27 @@ export async function updateTicketStatus(
   return data;
 }
 
+export async function createTicketReply(reply: {
+  ticket_id: string;
+  user_id: string;
+  sender_role: "affiliate" | "admin";
+  body: string;
+}) {
+  const sb = getServiceClient();
+  const { data, error } = await sb
+    .from("ticket_replies")
+    .insert({
+      ticket_id: reply.ticket_id,
+      user_id: reply.user_id,
+      sender_role: reply.sender_role,
+      body: reply.body,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
 export async function updateAsset(
   id: string,
   updates: Record<string, unknown>,
@@ -426,4 +447,32 @@ export async function updateBroadcast(
     .single();
   if (error) throw error;
   return data;
+}
+
+export async function updateAffiliateSettings(settings: Record<string, unknown>) {
+  const sb = getServiceClient();
+  const { data: existing } = await sb
+    .from("affiliate_settings")
+    .select("id")
+    .limit(1)
+    .single();
+
+  if (existing) {
+    const { data, error } = await sb
+      .from("affiliate_settings")
+      .update({ ...settings, updated_at: new Date().toISOString() })
+      .eq("id", existing.id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  } else {
+    const { data, error } = await sb
+      .from("affiliate_settings")
+      .insert({ ...settings, created_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
 }

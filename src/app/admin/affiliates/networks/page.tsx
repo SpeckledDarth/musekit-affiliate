@@ -5,33 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Globe, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { networksConfig } from "@/lib/networks-config";
 
-const networks = [
-  {
-    name: "ShareASale",
-    status: "connected",
-    affiliates: 120,
-    url: "https://shareasale.com",
-  },
-  {
-    name: "Impact",
-    status: "not_connected",
-    affiliates: 0,
-    url: "https://impact.com",
-  },
-  {
-    name: "CJ Affiliate",
-    status: "not_connected",
-    affiliates: 0,
-    url: "https://cj.com",
-  },
-  {
-    name: "Partnerize",
-    status: "connected",
-    affiliates: 45,
-    url: "https://partnerize.com",
-  },
-];
+const networks = networksConfig;
 
 export default function AdminAffiliateNetworks() {
 

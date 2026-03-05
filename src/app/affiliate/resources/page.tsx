@@ -159,7 +159,10 @@ export default function AffiliateResources() {
                     {asset.file_url ? (
                       <img src={asset.file_url} alt={asset.title} className="max-w-full h-auto mx-auto" />
                     ) : (
-                      `Banner Preview Placeholder`
+                      <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+                        <Image className="w-10 h-10 mb-2" />
+                        <span>No preview available</span>
+                      </div>
                     )}
                   </div>
                 ) : (

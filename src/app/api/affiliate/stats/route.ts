@@ -1,9 +1,15 @@
-import { NextResponse } from "next/server";
-import { getAffiliateDashboardStats, getFirstAffiliateUserId } from "@/lib/queries";
+import { NextRequest, NextResponse } from "next/server";
+import { getAffiliateDashboardStats } from "@/lib/queries";
+import { requireAffiliate } from "@/lib/auth";
 
-export async function GET() {
-  const userId = await getFirstAffiliateUserId();
-  if (!userId) return NextResponse.json({ total_clicks: 0, total_signups: 0, total_earnings_cents: 0, pending_earnings_cents: 0, paid_earnings_cents: 0, total_referrals: 0, converted_referrals: 0, conversion_rate: 0, commission_count: 0 });
-  const stats = await getAffiliateDashboardStats(userId);
-  return NextResponse.json(stats);
+export async function GET(request: NextRequest) {
+  try {
+    const auth = await requireAffiliate(request);
+    if (auth.error) return auth.error;
+    const stats = await getAffiliateDashboardStats(auth.userId);
+    return NextResponse.json(stats);
+  } catch (error) {
+    console.error("GET /api/affiliate/stats error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

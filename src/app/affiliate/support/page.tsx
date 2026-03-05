@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
@@ -9,10 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { toast } from "@/components/ui/toast";
-import { Plus } from "lucide-react";
+import { Plus, Send } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
-import type { SupportTicket } from "@/types";
+import type { SupportTicket, TicketReply } from "@/types";
 
 const priorityOptions = [
   { value: "low", label: "Low" },
@@ -100,6 +100,11 @@ export default function AffiliateSupport() {
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("low");
   const [category, setCategory] = useState("general");
+  const [replies, setReplies] = useState<TicketReply[]>([]);
+  const [repliesLoading, setRepliesLoading] = useState(false);
+  const [replyBody, setReplyBody] = useState("");
+  const [sendingReply, setSendingReply] = useState(false);
+  const repliesEndRef = useRef<HTMLDivElement>(null);
 
   const loadTickets = useCallback(async () => {
     try {
@@ -115,6 +120,47 @@ export default function AffiliateSupport() {
   useEffect(() => {
     loadTickets();
   }, [loadTickets]);
+
+  const loadReplies = useCallback(async (ticketId: string) => {
+    setRepliesLoading(true);
+    try {
+      const data = await api.affiliate.getTicketReplies(ticketId);
+      setReplies(data);
+    } catch {
+      toast.error("Failed to load replies");
+    } finally {
+      setRepliesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (detailTicket) {
+      loadReplies(detailTicket.id);
+      setReplyBody("");
+    } else {
+      setReplies([]);
+    }
+  }, [detailTicket, loadReplies]);
+
+  useEffect(() => {
+    if (repliesEndRef.current) {
+      repliesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [replies]);
+
+  const handleSendReply = async () => {
+    if (!replyBody.trim() || !detailTicket) return;
+    setSendingReply(true);
+    try {
+      await api.affiliate.addTicketReply(detailTicket.id, replyBody.trim());
+      setReplyBody("");
+      await loadReplies(detailTicket.id);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send reply");
+    } finally {
+      setSendingReply(false);
+    }
+  };
 
   const handleCreate = async () => {
     if (!subject.trim() || !description.trim()) return;
@@ -273,6 +319,54 @@ export default function AffiliateSupport() {
               <div>
                 <p className="text-sm font-medium text-gray-500">Resolved</p>
                 <p className="mt-1 text-gray-900">{formatDate(detailTicket.resolved_at)}</p>
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <p className="text-sm font-medium text-gray-500 mb-3">Replies</p>
+              <div className="max-h-64 overflow-y-auto space-y-3 mb-4">
+                {repliesLoading ? (
+                  <p className="text-sm text-gray-400">Loading replies...</p>
+                ) : replies.length === 0 ? (
+                  <p className="text-sm text-gray-400">No replies yet.</p>
+                ) : (
+                  replies.map((reply) => (
+                    <div
+                      key={reply.id}
+                      className={`p-3 rounded-lg text-sm ${
+                        reply.sender_role === "affiliate"
+                          ? "bg-blue-50 border border-blue-100 ml-8"
+                          : "bg-gray-50 border border-gray-100 mr-8"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium text-gray-700">
+                          {reply.sender_role === "affiliate" ? "You" : "Support"}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {formatDate(reply.created_at)}
+                        </span>
+                      </div>
+                      <p className="text-gray-900 whitespace-pre-wrap">{reply.body}</p>
+                    </div>
+                  ))
+                )}
+                <div ref={repliesEndRef} />
+              </div>
+              <div className="flex gap-2">
+                <Textarea
+                  value={replyBody}
+                  onChange={(e) => setReplyBody(e.target.value)}
+                  placeholder="Type your reply..."
+                  className="flex-1"
+                />
+                <Button
+                  onClick={handleSendReply}
+                  disabled={sendingReply || !replyBody.trim()}
+                  className="self-end"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
               </div>
             </div>
           </div>

@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { api } from "@/lib/api-client";
 
 export default function AdminAffiliateSettings() {
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [commissionRate, setCommissionRate] = useState("15");
   const [cookieDuration, setCookieDuration] = useState("30");
@@ -15,11 +17,37 @@ export default function AdminAffiliateSettings() {
   const [autoApprove, setAutoApprove] = useState(false);
   const [requireEmailVerification, setRequireEmailVerification] = useState(true);
 
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await api.admin.getSettings();
+        if (data) {
+          setCommissionRate(String(data.commission_rate ?? "15"));
+          setCookieDuration(String(data.cookie_duration ?? "30"));
+          setMinPayout(String(data.min_payout_amount ?? "50"));
+          setPayoutSchedule(String(data.payout_schedule ?? "monthly"));
+          setAutoApprove(Boolean(data.auto_approve));
+          setRequireEmailVerification(data.require_email_verification !== false);
+        }
+      } catch {
+        toast.error("Failed to load settings");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadSettings();
+  }, []);
+
   async function handleSaveCommission() {
     setSaving(true);
     try {
-      await new Promise((r) => setTimeout(r, 400));
-      toast.success("Settings saved");
+      await api.admin.updateSettings({
+        commission_rate: Number(commissionRate),
+        cookie_duration: Number(cookieDuration),
+        min_payout_amount: Number(minPayout),
+        payout_schedule: payoutSchedule,
+      });
+      toast.success("Commission settings saved");
     } catch {
       toast.error("Failed to save settings");
     } finally {
@@ -30,8 +58,11 @@ export default function AdminAffiliateSettings() {
   async function handleSaveApproval() {
     setSaving(true);
     try {
-      await new Promise((r) => setTimeout(r, 400));
-      toast.success("Settings saved");
+      await api.admin.updateSettings({
+        auto_approve: autoApprove,
+        require_email_verification: requireEmailVerification,
+      });
+      toast.success("Approval settings saved");
     } catch {
       toast.error("Failed to save settings");
     } finally {
@@ -39,11 +70,35 @@ export default function AdminAffiliateSettings() {
     }
   }
 
+  if (loading) {
+    return (
+      <div>
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Program Settings</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
+            Configure commission rates, cookie duration, and payout settings
+          </p>
+        </div>
+        <div className="space-y-6 max-w-2xl">
+          <Card>
+            <CardContent>
+              <div className="space-y-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Program Settings</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Program Settings</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">
           Configure commission rates, cookie duration, and payout settings
         </p>
       </div>
@@ -78,13 +133,13 @@ export default function AdminAffiliateSettings() {
                 min={0}
               />
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Payout Schedule
                 </label>
                 <select
                   value={payoutSchedule}
                   onChange={(e) => setPayoutSchedule(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
                 >
                   <option value="monthly">Monthly</option>
                   <option value="biweekly">Bi-weekly</option>
@@ -111,7 +166,7 @@ export default function AdminAffiliateSettings() {
                   onChange={(e) => setAutoApprove(e.target.checked)}
                   className="w-4 h-4 rounded border-gray-300 text-primary-600"
                 />
-                <span className="text-sm text-gray-700">
+                <span className="text-sm text-gray-700 dark:text-gray-300">
                   Auto-approve new affiliate applications
                 </span>
               </label>
@@ -122,7 +177,7 @@ export default function AdminAffiliateSettings() {
                   onChange={(e) => setRequireEmailVerification(e.target.checked)}
                   className="w-4 h-4 rounded border-gray-300 text-primary-600"
                 />
-                <span className="text-sm text-gray-700">
+                <span className="text-sm text-gray-700 dark:text-gray-300">
                   Require email verification before activation
                 </span>
               </label>
