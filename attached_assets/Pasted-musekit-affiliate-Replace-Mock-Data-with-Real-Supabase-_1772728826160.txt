@@ -1,0 +1,142 @@
+musekit-affiliate — Replace Mock Data with Real Supabase Queries
+Context
+You are working in the musekit-affiliate module Repl. This builds packages/affiliate/.
+
+CRITICAL: The ENTIRE package runs on mock data from src/lib/mock-data.ts. The Supabase client exists in src/lib/supabase.ts but is never imported anywhere else. Every page must be converted to use real database queries.
+
+Real Database Tables Available
+The database has a rich affiliate schema with real data. Here are ALL the tables with their columns and row counts:
+
+affiliate_profiles (1 row)
+id, user_id, display_name, legal_name, phone, website, bio, address_line1, address_line2, city, state, postal_code, country, payout_method, payout_email, payout_bank_name, payout_bank_routing, payout_bank_account, tax_id, onboarded_at, tour_completed, created_at, updated_at, show_in_directory, quiz_results
+
+referral_links (11 rows)
+id, user_id, ref_code, clicks, signups, created_at, updated_at, is_affiliate, locked_commission_rate, locked_duration_months, locked_at, current_tier_id, total_earnings_cents, paid_earnings_cents, pending_earnings_cents, affiliate_role, suspended, suspension_reason, fraud_score, fraud_score_updated_at, recruited_by_affiliate_id, locked_cookie_duration_days, locked_min_payout_cents
+
+affiliate_referrals (42 rows)
+id, affiliate_user_id, referred_user_id, ref_code, ip_hash, status, fraud_flags, converted_at, created_at, source_tag, commission_end_date, health_status, churned_at, churn_reason, last_active_at
+
+affiliate_commissions (55 rows)
+id, affiliate_user_id, referral_id, stripe_invoice_id, invoice_amount_cents, commission_rate, commission_amount_cents, status, created_at
+
+affiliate_payouts (32 rows)
+id, affiliate_user_id, amount_cents, method, status, notes, processed_at, processed_by, created_at, batch_id
+
+affiliate_payout_batches (8 rows)
+id, batch_date, total_affiliates, total_amount_cents, status, approved_by, approved_at, notes, created_at
+
+affiliate_payout_items (22 rows)
+id, payout_id, commission_id, amount_cents, created_at
+
+affiliate_tiers (7 rows)
+id, name, min_referrals, commission_rate, sort_order, created_at, updated_at, min_payout_cents, perks
+
+affiliate_milestones (11 rows)
+id, name, referral_threshold, bonus_amount_cents, description, is_active, sort_order, created_at, updated_at
+
+affiliate_assets (14 rows)
+id, title, description, asset_type, content, file_url, file_name, sort_order, active, created_at, updated_at, file_size, file_type
+
+affiliate_broadcasts (8 rows)
+id, subject, body, audience_filter, sent_count, opened_count, clicked_count, status, sent_at, sent_by, created_at, updated_at, category
+
+affiliate_messages (has data)
+id, affiliate_user_id, sender_id, sender_role, body, is_read, read_at, created_at
+
+affiliate_applications (6 rows)
+id, name, email, website_url, promotion_method, message, status, reviewer_notes, reviewed_by, reviewed_at, created_at, agreed_to_terms, terms_version
+
+affiliate_contests (has data)
+id, name, description, metric, start_date, end_date, prize_description, prize_amount_cents, status, winner_user_id, winner_announced_at, created_at, updated_at
+
+discount_codes (6 rows)
+id, code, description, discount_type, discount_value, duration, duration_months, max_uses, max_uses_per_user, min_plan, stackable, expires_at, affiliate_user_id, stripe_coupon_id, stripe_promotion_code_id, status, total_uses, total_discount_cents, created_by, created_at, updated_at
+
+announcements (5 rows)
+id, title, message, type, target_dashboards, is_active, created_by, created_at
+
+tickets (0 rows — for affiliate support tickets)
+id, user_id, assigned_to, subject, description, status, priority, category, ticket_number, created_at, updated_at, resolved_at, closed_at
+
+profiles (5 rows — for user data joins)
+id, email, full_name, avatar_url, stripe_customer_id, stripe_subscription_id, subscription_status, subscription_tier, created_at, updated_at, role
+
+Phase 1: Create Data Access Layer
+New file: src/lib/queries.ts
+
+Create Supabase query functions that replace every mock data import. Use the REAL table names and columns listed above. Return data in the same shape the mock data provides so UI components don't need restructuring.
+
+Key functions needed:
+
+getAffiliateProfile(userId) → query affiliate_profiles
+getAffiliateDashboardStats(userId) → aggregate from referral_links, affiliate_commissions, affiliate_referrals
+getReferrals(userId) → query affiliate_referrals WHERE affiliate_user_id = userId
+getReferralLinks(userId) → query referral_links WHERE user_id = userId
+getCommissions(userId) → query affiliate_commissions WHERE affiliate_user_id = userId
+getPayouts(userId) → query affiliate_payouts WHERE affiliate_user_id = userId
+getResources() → query affiliate_assets WHERE active = true
+getMessages(userId) → query affiliate_messages WHERE affiliate_user_id = userId
+getBroadcasts() → query affiliate_broadcasts WHERE status = 'sent'
+getSupportTickets(userId) → query tickets WHERE user_id = userId
+getTiers() → query affiliate_tiers ORDER BY sort_order
+getMilestones() → query affiliate_milestones ORDER BY sort_order
+Admin functions:
+
+getAdminAffiliateOverview() → aggregate counts from affiliate tables
+getAdminAffiliateList() → query affiliate_profiles with joins to referral_links
+getApplications() → query affiliate_applications
+getAdminBroadcasts() → query affiliate_broadcasts
+getContests() → query affiliate_contests
+getDiscountCodes() → query discount_codes
+getPayoutBatches() → query affiliate_payout_batches
+Phase 2: Replace Mock Imports Page by Page
+For EACH file, replace mock data imports with real queries from src/lib/queries.ts. Use useState + useEffect pattern or create custom hooks.
+
+Affiliate Dashboard Pages (user-facing):
+src/app/affiliate/page.tsx — mockStats, mockAffiliate, mockConversions
+src/app/affiliate/analytics/page.tsx — mockChartData, mockStats
+src/app/affiliate/earnings/page.tsx — mockConversions, mockStats
+src/app/affiliate/messages/page.tsx — mockMessages
+src/app/affiliate/news/page.tsx — mockBroadcasts
+src/app/affiliate/payouts/page.tsx — mockPayouts
+src/app/affiliate/referrals/page.tsx — mockReferrals
+src/app/affiliate/resources/page.tsx — mockAssets
+src/app/affiliate/settings/page.tsx — mockAffiliate
+src/app/affiliate/support/page.tsx — mockSupportTickets
+src/app/affiliate/tools/page.tsx — mockAffiliate
+Admin Affiliate Pages:
+src/app/admin/affiliates/page.tsx — overview dashboard
+src/app/admin/affiliates/applications/page.tsx → use affiliate_applications
+src/app/admin/affiliates/members/page.tsx → use affiliate_profiles + referral_links
+src/app/admin/affiliates/assets/page.tsx → use affiliate_assets
+src/app/admin/affiliates/broadcasts/page.tsx → use affiliate_broadcasts
+src/app/admin/affiliates/contests/page.tsx → use affiliate_contests
+src/app/admin/affiliates/discount-codes/page.tsx → use discount_codes
+src/app/admin/affiliates/milestones/page.tsx → use affiliate_milestones
+src/app/admin/affiliates/payout-runs/page.tsx → use affiliate_payout_batches + affiliate_payout_items
+src/app/admin/affiliates/tiers/page.tsx → use affiliate_tiers
+Phase 3: Add Mutation Handlers
+Action buttons need real database operations:
+
+Affiliate Settings: Save → update affiliate_profiles
+Admin Applications: Approve/Reject → update affiliate_applications.status
+Admin Broadcasts: Send → insert into affiliate_broadcasts
+Admin Discount Codes: CRUD → discount_codes table
+Admin Payout Runs: Run Payout → insert into affiliate_payout_batches + affiliate_payouts
+Admin Tiers: Edit → update affiliate_tiers
+Admin Milestones: Edit → update affiliate_milestones
+Admin Assets: Upload/Edit/Delete → affiliate_assets
+Admin Contests: Create/Edit → affiliate_contests
+Phase 4: Cleanup
+Delete src/lib/mock-data.ts once all pages use real queries.
+
+Testing Checklist
+Affiliate Dashboard loads real stats from DB (may show zeros initially)
+Referrals page shows 42 real referrals
+Earnings page shows real commission data
+Payouts page shows 32 real payouts
+Admin Affiliates overview shows real counts
+Admin Applications shows 6 real applications
+Admin Discount Codes CRUD works with real discount_codes table
+No imports of mock-data remain anywhere
+No console errors about missing tables/columns
