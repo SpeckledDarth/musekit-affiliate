@@ -6,7 +6,50 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, DollarSign, TrendingUp, UserPlus } from "lucide-react";
 import { api } from "@/lib/api-client";
+import { formatCents } from "@/lib/format";
 import type { AdminOverview, AffiliateListItem } from "@/types";
+
+function SkeletonStatCard() {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 animate-pulse">
+      <div className="flex items-center justify-between mb-2">
+        <div className="h-4 bg-gray-200 rounded w-24" />
+        <div className="h-5 w-5 bg-gray-200 rounded" />
+      </div>
+      <div className="h-8 bg-gray-200 rounded w-20 mt-2" />
+      <div className="h-3 bg-gray-200 rounded w-16 mt-2" />
+    </div>
+  );
+}
+
+function SkeletonList() {
+  return (
+    <Card>
+      <CardHeader>
+        <div className="h-5 bg-gray-200 rounded w-32 animate-pulse" />
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center justify-between py-2 animate-pulse">
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 bg-gray-200 rounded-full" />
+                <div>
+                  <div className="h-4 bg-gray-200 rounded w-32 mb-1" />
+                  <div className="h-3 bg-gray-200 rounded w-40" />
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="h-5 bg-gray-200 rounded-full w-16" />
+                <div className="h-5 bg-gray-200 rounded w-20" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function AdminAffiliatesOverview() {
   const [overview, setOverview] = useState<AdminOverview | null>(null);
@@ -34,8 +77,22 @@ export default function AdminAffiliatesOverview() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading overview...</div>
+      <div>
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Affiliate Program Overview
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Manage and monitor your affiliate program
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+        </div>
+        <SkeletonList />
       </div>
     );
   }
@@ -74,7 +131,7 @@ export default function AdminAffiliatesOverview() {
         />
         <StatCard
           label="Total Commissions"
-          value={`$${((overview?.total_commissions_cents ?? 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+          value={formatCents(overview?.total_commissions_cents ?? 0)}
           icon={DollarSign}
         />
         <StatCard
@@ -118,7 +175,7 @@ export default function AdminAffiliatesOverview() {
                       {affiliate.affiliate_role.toUpperCase()}
                     </Badge>
                     <span className="font-semibold text-gray-900">
-                      ${(affiliate.total_earnings_cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      {formatCents(affiliate.total_earnings_cents)}
                     </span>
                   </div>
                 </div>

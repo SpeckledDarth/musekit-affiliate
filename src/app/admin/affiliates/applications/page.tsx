@@ -1,12 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, X } from "lucide-react";
+import { DataTable } from "@/components/ui/data-table";
+import { Check, X, FileText } from "lucide-react";
 import { api } from "@/lib/api-client";
+import { formatDate } from "@/lib/format";
+import { toast } from "sonner";
 import type { AffiliateApplication } from "@/types";
+
+const statusBadgeVariant: Record<string, "warning" | "success" | "danger"> = {
+  pending: "warning",
+  approved: "success",
+  rejected: "danger",
+};
 
 export default function AffiliateApplications() {
   const [applications, setApplications] = useState<AffiliateApplication[]>([]);
@@ -35,19 +43,12 @@ export default function AffiliateApplications() {
       setApplications((prev) =>
         prev.map((app) => (app.id === id ? { ...app, status } : app)),
       );
+      toast.success(`Application ${status} successfully`);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Action failed");
+      toast.error(err instanceof Error ? err.message : "Action failed");
     } finally {
       setActionLoading(null);
     }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading applications...</div>
-      </div>
-    );
   }
 
   if (error) {
@@ -58,8 +59,83 @@ export default function AffiliateApplications() {
     );
   }
 
-  const pendingApps = applications.filter((a) => a.status === "pending");
-  const reviewedApps = applications.filter((a) => a.status !== "pending");
+  const columns = [
+    {
+      key: "name",
+      header: "Name / Email",
+      render: (app: AffiliateApplication) => (
+        <div>
+          <div className="font-medium text-gray-900">{app.name}</div>
+          <div className="text-sm text-gray-500">{app.email}</div>
+        </div>
+      ),
+    },
+    {
+      key: "website_url",
+      header: "Website",
+      render: (app: AffiliateApplication) =>
+        app.website_url ? (
+          <span className="text-sm text-gray-600">{app.website_url}</span>
+        ) : (
+          <span className="text-sm text-gray-400">—</span>
+        ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (app: AffiliateApplication) => (
+        <Badge variant={statusBadgeVariant[app.status] || "default"}>
+          {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+        </Badge>
+      ),
+    },
+    {
+      key: "created_at",
+      header: "Applied Date",
+      render: (app: AffiliateApplication) => (
+        <span className="text-sm text-gray-600">{formatDate(app.created_at)}</span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      sortable: false,
+      render: (app: AffiliateApplication) =>
+        app.status === "pending" ? (
+          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+            <Button
+              size="sm"
+              variant="secondary"
+              disabled={actionLoading === app.id}
+              onClick={() => handleAction(app.id, "rejected")}
+            >
+              <X className="w-4 h-4 mr-1" /> Reject
+            </Button>
+            <Button
+              size="sm"
+              disabled={actionLoading === app.id}
+              onClick={() => handleAction(app.id, "approved")}
+            >
+              <Check className="w-4 h-4 mr-1" /> Approve
+            </Button>
+          </div>
+        ) : (
+          <span className="text-sm text-gray-400">Reviewed</span>
+        ),
+    },
+  ];
+
+  const filters = [
+    {
+      key: "status",
+      label: "Status",
+      options: [
+        { value: "pending", label: "Pending" },
+        { value: "approved", label: "Approved" },
+        { value: "rejected", label: "Rejected" },
+      ],
+    },
+  ];
 
   return (
     <div>
@@ -72,84 +148,17 @@ export default function AffiliateApplications() {
         </p>
       </div>
 
-      {pendingApps.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-gray-500">
-            No pending applications
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4 mb-8">
-          {pendingApps.map((app) => (
-            <Card key={app.id}>
-              <CardContent className="py-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-gray-900">{app.name}</h3>
-                    <p className="text-sm text-gray-500">{app.email}</p>
-                    {app.website_url && (
-                      <p className="text-xs text-gray-400">{app.website_url}</p>
-                    )}
-                    {app.message && (
-                      <p className="text-sm text-gray-600 mt-1">{app.message}</p>
-                    )}
-                    <p className="text-xs text-gray-400 mt-1">
-                      Applied{" "}
-                      {new Date(app.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="warning">Pending Review</Badge>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      disabled={actionLoading === app.id}
-                      onClick={() => handleAction(app.id, "rejected")}
-                    >
-                      <X className="w-4 h-4 mr-1" /> Reject
-                    </Button>
-                    <Button
-                      size="sm"
-                      disabled={actionLoading === app.id}
-                      onClick={() => handleAction(app.id, "approved")}
-                    >
-                      <Check className="w-4 h-4 mr-1" /> Approve
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {reviewedApps.length > 0 && (
-        <>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Reviewed</h2>
-          <div className="space-y-4">
-            {reviewedApps.map((app) => (
-              <Card key={app.id}>
-                <CardContent className="py-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium text-gray-900">{app.name}</h3>
-                      <p className="text-sm text-gray-500">{app.email}</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Applied {new Date(app.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <Badge
-                      variant={app.status === "approved" ? "success" : "danger"}
-                    >
-                      {app.status}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </>
-      )}
+      <DataTable
+        columns={columns}
+        data={applications}
+        loading={loading}
+        searchable
+        searchPlaceholder="Search by name, email, or website..."
+        filters={filters}
+        emptyMessage="No applications found"
+        emptyIcon={<FileText className="w-8 h-8 text-gray-400" />}
+        title="Applications"
+      />
     </div>
   );
 }

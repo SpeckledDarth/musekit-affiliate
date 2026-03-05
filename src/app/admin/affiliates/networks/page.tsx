@@ -4,6 +4,7 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Globe, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 
 const networks = [
   {
@@ -33,6 +34,16 @@ const networks = [
 ];
 
 export default function AdminAffiliateNetworks() {
+
+  function handleConnect(name: string) {
+    toast.success(`Connection request sent to ${name}`);
+  }
+
+  function handleManage(name: string, url: string) {
+    toast.info(`Opening ${name} dashboard...`);
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
   return (
     <div>
       <div className="mb-8">
@@ -68,29 +79,43 @@ export default function AdminAffiliateNetworks() {
             </CardHeader>
             <CardContent>
               {network.status === "connected" ? (
-                <p className="text-sm text-gray-600">
-                  {network.affiliates} affiliates from this network
-                </p>
+                <div>
+                  <p className="text-sm text-gray-600">
+                    {network.affiliates} affiliates from this network
+                  </p>
+                  <a
+                    href={network.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 mt-1"
+                  >
+                    {network.url}
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
               ) : (
                 <p className="text-sm text-gray-500">
                   Connect to import affiliates from this network
                 </p>
               )}
               <div className="mt-3">
-                <Button
-                  variant={
-                    network.status === "connected" ? "secondary" : "primary"
-                  }
-                  size="sm"
-                >
-                  {network.status === "connected" ? (
-                    <>
-                      <ExternalLink className="w-4 h-4 mr-1" /> Manage
-                    </>
-                  ) : (
-                    "Connect"
-                  )}
-                </Button>
+                {network.status === "connected" ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleManage(network.name, network.url)}
+                  >
+                    <ExternalLink className="w-4 h-4 mr-1" /> Manage
+                  </Button>
+                ) : (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => handleConnect(network.name)}
+                  >
+                    Connect
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
