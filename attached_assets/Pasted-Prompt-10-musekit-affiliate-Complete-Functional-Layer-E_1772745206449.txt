@@ -1,0 +1,316 @@
+Prompt 10: musekit-affiliate — Complete Functional Layer (Exports Fix + List View Standards + Full CRUD + All Buttons Wired)
+Module Repl
+musekit-affiliate (GitHub: SpeckledDarth/musekit-affiliate)
+
+Context
+The affiliate package renders pages but almost nothing is functional. No table has sorting, search, or filter. No row is clickable. 12+ buttons are decorative (no click handlers). Most pages are read-only displays with no ability to create, edit, or manage records. This prompt makes every page fully operational.
+
+CRITICAL FIX A: Missing Barrel Exports
+src/index.ts currently exports from 4 subdirectories but NOT from ./dashboard or ./admin:
+
+export * from "./types";
+export * from "./core";
+export * from "./lib/queries";
+export * from "./lib/mutations";
+Fix: Add these two lines:
+
+export * from "./dashboard";
+export * from "./admin";
+Verify that src/dashboard/index.ts and src/admin/index.ts exist and re-export all their components. If those barrel files don't exist, create them.
+
+STANDARD B: Site-Wide List View Requirements
+Apply to EVERY table/list in both the affiliate portal and admin affiliate pages:
+
+B1. Column Sorting
+Every column header clickable → toggle asc/desc
+Visual sort indicator arrow on active column
+Build a reusable useSortable hook or integrate into the existing DataTable component
+B2. Search
+Search input above every table
+Filter across all text columns
+Debounced (300ms)
+B3. Filter
+Relevant filter dropdowns for each table
+"All" as default
+Multiple filters simultaneously
+B4. Row Click-Through
+Every row clickable → opens detail view (page or modal)
+cursor-pointer + hover highlight on all rows
+Detail views show all record fields + related data
+STANDARD C: Full CRUD
+Every entity must support Create, Read, Update, Delete unless specifically noted:
+
+Create: Button in header → form (modal or page)
+Edit: Click row → detail → edit form
+Delete: Confirmation dialog
+Bulk actions: Checkbox column → bulk operations
+Affiliate Portal Pages (User-Facing)
+1. Dashboard (src/app/affiliate/dashboard/page.tsx)
+Currently: Shows "Loading dashboard..." (API calls fail with 404) Required:
+
+Display stat cards: Total Referrals, Active Referrals, Total Earnings, Pending Earnings, Current Tier
+Recent activity feed (last 10 referrals/commissions)
+Earnings chart (last 30 days)
+Quick links to other pages
+All data fetched from Supabase directly (not API routes) — use the existing query functions in src/lib/queries.ts
+2. Referrals (src/app/affiliate/referrals/page.tsx)
+Currently: DataTable with no sorting, search, filter, or click-through Required:
+
+Column sorting on all columns (Ref Code, Date, Status, Source)
+Search by ref code or source
+Filter by status (All / Pending / Converted / Expired / Fraudulent)
+Click row → Referral Detail modal/page:
+Full referral info: ref code, referred user (anonymized), signup date, conversion date
+Commission history for this referral (from affiliate_commissions where referral_id matches)
+Status timeline: Created → Converted → Commissions Paid
+Health status indicator
+3. Earnings (src/app/affiliate/earnings/page.tsx)
+Currently: DataTable + stat cards, no sorting/search/filter/click-through Required:
+
+Column sorting on all columns (Date, Sale Amount, Rate, Commission, Status)
+Search by date range
+Filter by status (All / Pending / Approved / Paid / Disputed)
+Filter by date range (This Month / Last Month / Last 90 Days / Custom)
+Click row → Earnings Detail modal:
+Commission breakdown: invoice amount, rate, commission amount
+Associated referral info
+Payout info (if paid — which payout batch, when processed)
+4. Payouts (src/app/affiliate/payouts/page.tsx)
+Currently: DataTable, no sorting/search/filter/click-through Required:
+
+Column sorting (Date, Amount, Method, Status)
+Filter by status (All / Pending / Processing / Completed / Failed)
+Filter by method (All / PayPal / Bank Transfer / Other)
+Click row → Payout Detail modal:
+Full payout info: amount, method, status, processing date, batch ID
+Line items: individual commissions included in this payout (from affiliate_payout_items)
+Notes
+5. Resources (src/app/affiliate/resources/page.tsx)
+Currently: Card grid of marketing assets. "Copy" and "Download" buttons have NO click handlers. Required:
+
+Wire "Copy" button: Copy the asset content/URL to clipboard using navigator.clipboard.writeText(). Show toast/notification "Copied!"
+Wire "Download" button: Trigger file download for assets with file_url. Use <a href={url} download> pattern or fetch + Blob for cross-origin
+Search/filter by asset type (Banner, Text, Social, Email)
+Show asset preview for images
+6. Support (src/app/affiliate/support/page.tsx)
+Currently: "New Ticket" button has NO click handler Required:
+
+Wire "New Ticket" button → modal with form: subject, description, priority selector, category selector
+Save ticket to tickets table via Supabase
+Show existing tickets for this affiliate user (from tickets table where user_id matches)
+Click ticket → expand to show full conversation thread
+Reply form on each ticket
+7. Messages (src/app/affiliate/messages/page.tsx)
+Currently: "New Message" button has NO click handler Required:
+
+Wire "New Message" button → compose form: recipient (admin), subject/body
+Save to affiliate_messages table
+Show message thread (from affiliate_messages where affiliate_user_id matches)
+Mark as read when opened
+Reply inline
+8. Analytics (src/app/affiliate/analytics/page.tsx)
+Currently: Basic chart with 30-day data Required:
+
+Date range selector (7d / 30d / 90d / Custom)
+Multiple chart types: line chart for clicks/signups over time, bar chart for conversions by source
+Key metrics: Conversion Rate, Average Commission, Click-to-Signup Ratio
+Data table below charts with sortable columns
+9. Tools (src/app/affiliate/tools/page.tsx)
+Required:
+
+Referral link generator: input campaign name → generate branded referral URL
+Copy link button (working)
+QR code generator for referral links
+UTM builder for custom tracking parameters
+10. Settings (src/app/affiliate/settings/page.tsx)
+Required:
+
+Avatar upload: Use the ImageUpload component to upload to Supabase Storage assets/avatars/. Save the public URL to profiles.avatar_url (NOT affiliate_profiles) so the avatar is visible app-wide (header, admin user list, etc.), not just in the affiliate portal. Show current avatar as circle preview.
+Edit profile info (display name, website, bio)
+Payout preferences (method, email, bank details)
+Notification preferences (email on new referral, new commission, payout processed)
+Save button → persist affiliate-specific fields to affiliate_profiles table AND avatar/display name to profiles table. Show toast on success.
+Admin Affiliate Pages
+11. Overview (src/app/admin/affiliates/page.tsx)
+Currently: Shows stat cards and top performers (API calls fail with 404) Required:
+
+Fix data fetching to use Supabase directly (not API routes)
+Stat cards: Total Affiliates, Active, Pending Applications, Total Commissions Paid, Total Revenue Generated
+Top performers table with click-through to member detail
+Recent activity feed
+12. Members (src/app/admin/affiliates/members/page.tsx)
+Currently: DataTable, no sorting/search/filter/click-through, no actions Required:
+
+Column sorting on all columns (Name, Role, Status, Signups, Earnings, Rate)
+Search by name/email
+Filter by status (All / Active / Suspended / Pending), tier, role
+Click row → Member Detail page/modal:
+Full affiliate profile (from affiliate_profiles)
+Performance stats: referrals, conversions, earnings, current tier
+Referral list for this member
+Commission history
+Payout history
+Admin actions: edit commission rate, change tier, suspend/unsuspend, add note
+Bulk actions: Bulk suspend, bulk tier change
+13. Applications (src/app/admin/affiliates/applications/page.tsx)
+Currently: Card list split by Pending/Reviewed, Approve/Reject buttons work Required:
+
+Convert to table format (or keep cards but add sorting/search)
+Search by name/email
+Filter by status (All / Pending / Approved / Rejected)
+Column sorting (Name, Date, Status)
+Click → Full application review page:
+All application fields: name, email, website, promotion method, message
+Reviewer notes (editable textarea)
+Approve with custom commission rate
+Reject with reason
+14. Tiers (src/app/admin/affiliates/tiers/page.tsx)
+Currently: Card grid, completely read-only, no CRUD Required:
+
+Create tier: "Add Tier" button → form with: name, min referrals, commission rate, min payout, perks (JSON editor or structured form), sort order
+Edit tier: Click card → edit form (same fields)
+Delete tier: Delete button with confirmation. Warn if affiliates are currently on this tier.
+Sort tiers by sort_order
+Search by tier name
+15. Broadcasts (src/app/admin/affiliates/broadcasts/page.tsx)
+Currently: Card list, "New Broadcast" button has NO click handler Required:
+
+Wire "New Broadcast" button → compose form:
+Subject line
+Body (rich text or plain text)
+Audience filter: All affiliates / By tier / By status / Custom selection
+Preview before sending
+Send / Save as Draft
+Broadcast list: Table with columns: Subject, Status (Draft/Sent), Audience, Sent Count, Open Count, Date
+Column sorting, search by subject
+Click row → detail page showing full broadcast content, delivery stats, recipient list
+Edit/Delete for draft broadcasts
+16. Assets (src/app/admin/affiliates/assets/page.tsx)
+Currently: Card grid, "Add Asset" button has NO click handler, delete exists Required:
+
+Wire "Add Asset" button → form:
+Title, description
+Asset type selector (Banner, Text, Social, Email, Video)
+File upload (image/file) via Supabase Storage
+OR content text field (for text/email assets)
+Active toggle
+Edit asset: Click card → edit form
+Search by title, filter by type
+Sort by sort_order, date
+17. Milestones (src/app/admin/affiliates/milestones/page.tsx)
+Currently: Card grid, "Add Milestone" button has NO click handler Required:
+
+Wire "Add Milestone" button → form: name, referral threshold, bonus amount, description, active toggle
+Edit milestone: Click card → edit form
+Delete milestone with confirmation
+Sort by threshold/sort_order
+18. Contests (src/app/admin/affiliates/contests/page.tsx)
+Currently: Card grid, "Create Contest" button has NO click handler Required:
+
+Wire "Create Contest" button → form: name, description, metric (referrals/revenue/signups), start date, end date, prize description, prize amount
+Edit contest: Click card → edit form
+Delete contest with confirmation
+Leaderboard: Show current standings for active contests
+Filter by status (All / Active / Upcoming / Completed)
+19. Payout Runs (src/app/admin/affiliates/payout-runs/page.tsx)
+Currently: DataTable, "New Payout Run" button has NO click handler Required:
+
+Wire "New Payout Run" button → batch creation flow:
+Select date range for commissions to include
+Preview: show list of affiliates, amounts, total
+Confirm → create batch in affiliate_payout_batches, create items in affiliate_payout_items
+Mark commissions as "paid"
+Column sorting (Period, Amount, Affiliates, Status)
+Click row → batch detail: list of individual payouts in this batch
+Approve batch action (set approved_by, approved_at)
+Filter by status (All / Pending / Approved / Processing / Completed)
+20. Discount Codes (src/app/admin/affiliates/discount-codes/page.tsx)
+Currently: DataTable with create/delete buttons. "Create Code" has NO click handler. Required:
+
+Wire "Create Code" button → form with ALL fields from the discount_codes table:
+Code (text, auto-generate option)
+Description
+Discount type (percentage / fixed)
+Discount value
+Duration (once / repeating / forever), duration months
+Max uses, max uses per user
+Min plan requirement
+Stackable toggle
+Expiry date
+Affiliate assignment (optional — link to specific affiliate)
+Edit code: Click row → edit form
+Column sorting, search by code/description
+Filter by status (All / Active / Expired / Maxed Out)
+21. Settings (src/app/admin/affiliates/settings/page.tsx)
+Currently: "Save Settings" buttons have NO form logic — completely decorative Required:
+
+Wire save buttons to persist settings via Supabase
+Settings to manage:
+Default commission rate
+Cookie duration (days)
+Minimum payout threshold
+Auto-approve applications toggle
+Require terms agreement toggle
+Payout schedule (monthly/bi-weekly/weekly)
+Load existing values on page load
+Show success toast on save
+22. Networks (src/app/admin/affiliates/networks/page.tsx)
+Currently: Card grid with hardcoded network data, "Connect"/"Manage" buttons are decorative Required:
+
+Either implement actual network integration configuration, OR
+Mark clearly as "Coming Soon — Roadmap" with a proper UI treatment (not just dead buttons)
+If implementing: save network API keys/credentials to affiliate_network_settings table, show connection status
+Integration Rules
+All components must use "use client" directive
+All imports must use relative paths (NOT @/ aliases)
+Use next/navigation (NOT next/router) for ALL routing
+Data access pattern: All data fetching must use Supabase client directly (via the existing client from src/lib/supabase.ts or query functions from src/lib/queries.ts / src/lib/mutations.ts). Do NOT use fetch("/api/...") API routes — the integration Repl may not have those API routes wired. Components should query Supabase directly using the browser client.
+Use existing UI components from src/components/ui/ (Card, Button, Input, Badge, DataTable, StatCard, Sidebar)
+Export ALL components from barrel files (src/dashboard/index.ts, src/admin/index.ts, src/index.ts)
+For image/file uploads: use Supabase Storage. Initialize with the existing Supabase client. Use assets bucket.
+Database Reference Tables
+Key tables this module reads/writes (verify column names against the live schema):
+
+affiliate_profiles — affiliate member details, payout info
+referral_links — performance tracking, tier, earnings
+affiliate_referrals — individual referral records
+affiliate_commissions — earnings per referral
+affiliate_payouts — individual payout records
+affiliate_payout_batches — batch payout runs
+affiliate_payout_items — line items in a payout
+affiliate_tiers — tier definitions
+affiliate_milestones — milestone bonus thresholds
+affiliate_assets — marketing materials
+affiliate_broadcasts — mass communications
+affiliate_applications — join requests
+affiliate_contests — competition events
+affiliate_messages — affiliate ↔ admin messaging
+discount_codes — promotional codes
+tickets — support tickets (shared with main app)
+STANDARD E Cross-Reference
+Apply all UX Standards from Prompt 09 STANDARD E to every component in this module:
+
+Toast notifications (sonner) on every mutation
+Empty states on every list with zero rows
+Confirmation dialogs on all destructive operations
+Dark mode (dark: classes) on all UI
+Loading skeletons on every data-fetching page
+Unsaved changes warning on every form
+Form validation with inline error messages
+Relative timestamps with hover tooltips
+Row counts in list page titles
+Breadcrumbs on every detail/drill-down page
+Pagination (25 rows/page, page in URL)
+URL-persisted filters (search, filter, sort in query params)
+Bulk operations (checkbox column, floating action bar)
+CSV export on every list view
+Audit logging on every create/update/delete mutation
+Supabase Realtime Subscriptions
+Tickets Realtime
+Subscribe to postgres_changes on the tickets table filtered by the current affiliate user's user_id. When a new ticket is created or an existing ticket's status changes, update the tickets list in real time without requiring a page refresh. Use supabase.channel('tickets').on('postgres_changes', ...).
+
+Messages Realtime
+Subscribe to postgres_changes on the affiliate_messages table filtered by the current affiliate user's affiliate_user_id. New messages from admin appear instantly in the message thread. Show a subtle notification indicator when a new message arrives while the user is on another page.
+
+After Fix
+Push to GitHub. The integration Repl will pull the updated src/ files. No new route wiring needed — the existing affiliate pages will have the new functionality built in.
