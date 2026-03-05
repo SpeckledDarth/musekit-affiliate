@@ -1,3 +1,4 @@
+export { default as AdminAffiliateOverview } from "@/app/admin/affiliates/page";
 export { default as AffiliateApplications } from "@/app/admin/affiliates/applications/page";
 export { default as AdminAffiliateSettings } from "@/app/admin/affiliates/settings/page";
 export { default as AdminAffiliateAssets } from "@/app/admin/affiliates/assets/page";

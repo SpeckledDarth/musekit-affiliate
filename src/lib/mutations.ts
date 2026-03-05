@@ -261,3 +261,169 @@ export async function createSupportTicket(ticket: {
   if (error) throw error;
   return data;
 }
+
+export async function createTier(tier: {
+  name: string;
+  min_referrals: number;
+  commission_rate: number;
+  min_payout_cents?: number;
+  perks?: string[];
+  sort_order?: number;
+}) {
+  const sb = getServiceClient();
+  const { data, error } = await sb
+    .from("affiliate_tiers")
+    .insert({
+      name: tier.name,
+      min_referrals: tier.min_referrals,
+      commission_rate: tier.commission_rate,
+      min_payout_cents: tier.min_payout_cents || null,
+      perks: tier.perks || [],
+      sort_order: tier.sort_order || 0,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteTier(id: string) {
+  const sb = getServiceClient();
+  const { error } = await sb.from("affiliate_tiers").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function createMilestone(milestone: {
+  name: string;
+  referral_threshold: number;
+  bonus_amount_cents: number;
+  description?: string;
+  is_active?: boolean;
+  sort_order?: number;
+}) {
+  const sb = getServiceClient();
+  const { data, error } = await sb
+    .from("affiliate_milestones")
+    .insert({
+      name: milestone.name,
+      referral_threshold: milestone.referral_threshold,
+      bonus_amount_cents: milestone.bonus_amount_cents,
+      description: milestone.description || "",
+      is_active: milestone.is_active !== false,
+      sort_order: milestone.sort_order || 0,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteMilestone(id: string) {
+  const sb = getServiceClient();
+  const { error } = await sb
+    .from("affiliate_milestones")
+    .delete()
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteContest(id: string) {
+  const sb = getServiceClient();
+  const { error } = await sb
+    .from("affiliate_contests")
+    .delete()
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteBroadcast(id: string) {
+  const sb = getServiceClient();
+  const { error } = await sb
+    .from("affiliate_broadcasts")
+    .delete()
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function createMessage(message: {
+  affiliate_user_id: string;
+  sender_id: string;
+  sender_role: "affiliate" | "admin";
+  body: string;
+}) {
+  const sb = getServiceClient();
+  const { data, error } = await sb
+    .from("affiliate_messages")
+    .insert({
+      affiliate_user_id: message.affiliate_user_id,
+      sender_id: message.sender_id,
+      sender_role: message.sender_role,
+      body: message.body,
+      is_read: false,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function markMessageRead(id: string) {
+  const sb = getServiceClient();
+  const { error } = await sb
+    .from("affiliate_messages")
+    .update({ is_read: true, read_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function updateTicketStatus(
+  id: string,
+  status: string,
+  notes?: string,
+) {
+  const sb = getServiceClient();
+  const updates: Record<string, unknown> = {
+    status,
+    updated_at: new Date().toISOString(),
+  };
+  if (status === "resolved") updates.resolved_at = new Date().toISOString();
+  if (status === "closed") updates.closed_at = new Date().toISOString();
+  const { data, error } = await sb
+    .from("tickets")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateAsset(
+  id: string,
+  updates: Record<string, unknown>,
+) {
+  const sb = getServiceClient();
+  const { data, error } = await sb
+    .from("affiliate_assets")
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateBroadcast(
+  id: string,
+  updates: Record<string, unknown>,
+) {
+  const sb = getServiceClient();
+  const { data, error } = await sb
+    .from("affiliate_broadcasts")
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}

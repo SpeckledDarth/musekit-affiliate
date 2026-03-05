@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupportTickets, getFirstAffiliateUserId } from "@/lib/queries";
-import { createSupportTicket } from "@/lib/mutations";
+import { createSupportTicket, updateTicketStatus } from "@/lib/mutations";
 
 export async function GET() {
   const userId = await getFirstAffiliateUserId();
@@ -14,6 +14,10 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: "No affiliate found" }, { status: 404 });
   const body = await req.json();
   try {
+    if (body.action === "update_status" && body.id) {
+      const result = await updateTicketStatus(body.id, body.status);
+      return NextResponse.json(result);
+    }
     const ticket = await createSupportTicket({ ...body, user_id: userId });
     return NextResponse.json(ticket);
   } catch (err: unknown) {

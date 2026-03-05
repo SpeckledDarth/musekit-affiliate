@@ -13,6 +13,8 @@ This is the `@musekit/affiliate` package — a standalone affiliate/referral pro
 - **Payments**: Stripe (for commission tracking)
 - **Charts**: Recharts
 - **Icons**: Lucide React
+- **Toasts**: Sonner
+- **QR Codes**: qrcode.react
 
 ## Project Structure
 
@@ -24,23 +26,55 @@ src/
 │   └── api/                # API routes (server-side data access)
 │       ├── affiliate/      # Affiliate-facing API endpoints
 │       └── admin/affiliates/ # Admin API endpoints
-├── components/ui/          # Shared UI components
+├── components/ui/          # Shared UI components (15 components)
+│   ├── badge.tsx           # Status badges
+│   ├── button.tsx          # Primary/secondary/ghost buttons
+│   ├── card.tsx            # Card container
+│   ├── confirm-dialog.tsx  # Delete/action confirmation modal
+│   ├── data-table.tsx      # Full-featured DataTable (sort/search/filter/paginate/select)
+│   ├── empty-state.tsx     # Empty state with icon, message, optional action
+│   ├── input.tsx           # Form input with label, error state, icon
+│   ├── loading-skeleton.tsx # Skeleton loaders (line, card, table)
+│   ├── modal.tsx           # Modal dialog with overlay, body scroll lock
+│   ├── search-input.tsx    # Debounced search input with clear button
+│   ├── select.tsx          # Select dropdown with label
+│   ├── stat-card.tsx       # Metric display card
+│   ├── tabs.tsx            # Tab switcher for detail views
+│   ├── textarea.tsx        # Multi-line input with label
+│   └── toast.tsx           # Toast provider (Sonner) + toast helper
 ├── core/                   # Business logic (tracking, commissions)
+├── hooks/                  # Custom React hooks
+│   ├── use-debounce.ts     # Debounce hook for search inputs
+│   └── use-unsaved-changes.ts # Warn on navigating away from dirty forms
 ├── lib/                    # Supabase client, queries, mutations, API client
 │   ├── supabase.ts         # Supabase client initialization
 │   ├── queries.ts          # Read operations (server-side only)
 │   ├── mutations.ts        # Write operations (server-side only)
-│   └── api-client.ts       # Client-side API wrapper (fetch-based)
+│   ├── api-client.ts       # Client-side API wrapper (fetch-based, full CRUD)
+│   └── format.ts           # Formatting utilities (formatCents, formatDate, relativeTime, etc.)
 ├── types/                  # TypeScript interfaces
-└── index.ts                # Package exports
+├── dashboard/index.ts      # Barrel exports for affiliate dashboard pages
+├── admin/index.ts          # Barrel exports for admin panel pages
+└── index.ts                # Package root exports
 ```
 
 ## Architecture
 
 - **Data access pattern**: All Supabase queries run server-side in Next.js API routes (`src/app/api/`). Client components use `src/lib/api-client.ts` to fetch data via HTTP. This avoids exposing Supabase keys to the browser.
 - **Server-side**: `src/lib/queries.ts` (reads) and `src/lib/mutations.ts` (writes) use Supabase service client
-- **Client-side**: `src/lib/api-client.ts` provides a typed `api` object that calls the API routes
-- **Amounts**: Stored in cents in the database (e.g., `commission_amount_cents`, `amount_cents`, `total_earnings_cents`)
+- **Client-side**: `src/lib/api-client.ts` provides a typed `api` object with full CRUD for all entities (GET, POST, PUT, DELETE)
+- **Amounts**: Stored in cents in the database (e.g., `commission_amount_cents`, `amount_cents`, `total_earnings_cents`). Use `formatCents()` from `src/lib/format.ts` to display.
+
+## DataTable Component
+
+The `DataTable` component (`src/components/ui/data-table.tsx`) is the core table display for all list pages. Features:
+- **Column sorting**: Click headers to sort asc/desc/none with visual indicators
+- **Search**: Built-in debounced search across all text columns
+- **Filter dropdowns**: Configurable filter chips for status, type, etc.
+- **Pagination**: 25 rows/page with prev/next and page indicator
+- **Row click**: Optional `onRowClick` for navigation to detail views
+- **Checkbox selection**: Optional `selectable` prop for bulk actions
+- **Loading/empty states**: Skeleton rows when loading, EmptyState when no data
 
 ## Running
 
@@ -79,6 +113,25 @@ npm start       # Production server on port 5000
 - `/admin/affiliates/payout-runs` — Batch payouts
 - `/admin/affiliates/discount-codes` — Discount codes
 
+## API Routes (Full CRUD)
+
+### Affiliate-facing
+- `GET/POST /api/affiliate/messages` — Messages + send/mark-read
+- `GET/POST /api/affiliate/support-tickets` — Tickets + create/update-status
+- `GET /api/affiliate/stats`, `/referral-links`, `/referrals`, `/commissions`, `/payouts`, `/resources`, `/broadcasts`, `/announcements`, `/tiers`, `/milestones`
+- `GET/POST /api/affiliate/profile` — Profile read/update
+
+### Admin
+- `GET/POST/PUT/DELETE /api/admin/affiliates/tiers` — Full CRUD
+- `GET/POST/PUT/DELETE /api/admin/affiliates/milestones` — Full CRUD
+- `GET/POST/PUT/DELETE /api/admin/affiliates/contests` — Full CRUD
+- `GET/POST/PUT/DELETE /api/admin/affiliates/broadcasts` — Full CRUD
+- `GET/POST/PUT/DELETE /api/admin/affiliates/assets` — Full CRUD
+- `GET/POST/PUT/DELETE /api/admin/affiliates/discount-codes` — Full CRUD
+- `GET/POST /api/admin/affiliates/payout-batches` — Read + create
+- `GET/POST /api/admin/affiliates/applications` — Read + update status
+- `GET /api/admin/affiliates/overview`, `/list`
+
 ## Environment Variables
 
 All required secrets are configured:
@@ -92,9 +145,17 @@ All required secrets are configured:
 
 Real Supabase tables: `referral_links`, `affiliate_referrals`, `affiliate_commissions`, `affiliate_payouts`, `affiliate_tiers`, `affiliate_milestones`, `affiliate_assets`, `affiliate_broadcasts`, `affiliate_messages`, `affiliate_applications`, `affiliate_contests`, `discount_codes`, `announcements`, `tickets`, `affiliate_payout_batches`, `affiliate_payout_items`, `profiles`.
 
+## Development Phases
+
+- **Phase 1 (Foundation)**: COMPLETED — UI components, DataTable overhaul, barrel exports, CRUD API routes, hooks, format utilities
+- **Phase 2 (Affiliate Portal)**: All 11 affiliate pages fully functional with CRUD, working buttons, detail views
+- **Phase 3 (Admin Panel)**: All 12 admin pages fully functional with CRUD, bulk actions, detail views
+- **Phase 4 (Polish)**: Dark mode, toasts on all mutations, CSV export, Realtime subscriptions, URL-persisted filters
+
 ## Notes
 
 - UI components are self-contained in `src/components/ui/` until `@musekit/design-system` is available.
 - Core business logic is in `src/core/index.ts`.
 - DataTable component uses `any` types to avoid type incompatibility across different table schemas.
 - `frame-ancestors *` in next.config.js is intentional for Replit proxy iframe embedding.
+- ToastProvider (Sonner) is mounted in the root layout for app-wide toast notifications.
