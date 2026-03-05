@@ -58,11 +58,13 @@ export function SkeletonTable({
           <Skeleton key={i} className="h-3 w-20" />
         ))}
       </div>
-      <div>
-        {Array.from({ length: rows }).map((_, i) => (
-          <SkeletonTableRow key={i} columns={columns} />
-        ))}
-      </div>
+      <table className="w-full">
+        <tbody>
+          {Array.from({ length: rows }).map((_, i) => (
+            <SkeletonTableRow key={i} columns={columns} />
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

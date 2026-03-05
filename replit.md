@@ -148,7 +148,18 @@ Real Supabase tables: `referral_links`, `affiliate_referrals`, `affiliate_commis
 ## Development Phases
 
 - **Phase 1 (Foundation)**: COMPLETED — UI components, DataTable overhaul, barrel exports, CRUD API routes, hooks, format utilities
-- **Phase 2 (Affiliate Portal)**: All 11 affiliate pages fully functional with CRUD, working buttons, detail views
+- **Phase 2 (Affiliate Portal)**: COMPLETED — All 11 affiliate pages fully functional:
+  - Dashboard: Skeleton loading, formatCents/formatDate utilities
+  - Analytics: Date range selector (7d/30d/90d/All Time), dynamic chart filtering
+  - Referrals: DataTable with search, status filter, row-click detail modal
+  - Earnings: DataTable with search, status filter, formatCents for all amounts
+  - Payouts: DataTable with search, status/method filters, row-click detail modal
+  - Resources: Working Copy/Download buttons, search, asset type tabs, toast feedback
+  - Tools: QR code generation (qrcode.react), download as PNG, toast copy feedback
+  - News: Click-to-detail modal with full broadcast info, formatDate
+  - Messages: New Message modal with send, mark-as-read, relativeTime, EmptyState
+  - Support: New Ticket modal (subject/description/priority/category), DataTable with search/filters, detail modal
+  - Settings: Toast feedback (replacing inline messages), Input/Select components, useUnsavedChanges hook
 - **Phase 3 (Admin Panel)**: All 12 admin pages fully functional with CRUD, bulk actions, detail views
 - **Phase 4 (Polish)**: Dark mode, toasts on all mutations, CSV export, Realtime subscriptions, URL-persisted filters
 

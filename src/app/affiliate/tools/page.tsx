@@ -3,7 +3,10 @@
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Link, Code } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { toast } from "@/components/ui/toast";
+import { Copy, Link, Code, Download, QrCode } from "lucide-react";
+import { QRCodeCanvas } from "qrcode.react";
 import { api } from "@/lib/api-client";
 import { generateReferralLink } from "@/core";
 import type { ReferralLink } from "@/types";
@@ -11,7 +14,6 @@ import type { ReferralLink } from "@/types";
 export default function AffiliateTools() {
   const [campaign, setCampaign] = useState("");
   const [generatedLink, setGeneratedLink] = useState("");
-  const [copied, setCopied] = useState(false);
   const [refCode, setRefCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,8 +41,17 @@ export default function AffiliateTools() {
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    toast.success("Copied to clipboard!");
+  };
+
+  const handleDownloadQR = () => {
+    const canvas = document.querySelector("#qr-code canvas") as HTMLCanvasElement;
+    if (!canvas) return;
+    const url = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "referral-qr.png";
+    a.click();
   };
 
   if (loading) {
@@ -51,7 +62,10 @@ export default function AffiliateTools() {
     );
   }
 
-  const bannerCode = `<a href="${generatedLink || generateReferralLink(refCode || "")}">
+  const defaultLink = generateReferralLink(refCode || "");
+  const qrLink = generatedLink || defaultLink;
+
+  const bannerCode = `<a href="${qrLink}">
   <img src="https://musekit.io/assets/banner-728x90.png" alt="MuseKit" width="728" height="90" />
 </a>`;
 
@@ -74,38 +88,56 @@ export default function AffiliateTools() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Campaign Name (optional)
-                </label>
-                <input
-                  type="text"
-                  value={campaign}
-                  onChange={(e) => setCampaign(e.target.value)}
-                  placeholder="e.g., youtube-review, instagram-bio"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                />
-              </div>
+              <Input
+                label="Campaign Name (optional)"
+                type="text"
+                value={campaign}
+                onChange={(e) => setCampaign(e.target.value)}
+                placeholder="e.g., youtube-review, instagram-bio"
+              />
               <Button onClick={handleGenerate} disabled={!refCode}>
                 Generate Link
               </Button>
               {generatedLink && (
                 <div className="flex items-center gap-2">
-                  <input
+                  <Input
                     type="text"
                     readOnly
                     value={generatedLink}
-                    className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm font-mono"
+                    className="flex-1 bg-gray-50 font-mono"
                   />
                   <Button
                     variant="secondary"
                     onClick={() => handleCopy(generatedLink)}
                   >
                     <Copy className="w-4 h-4 mr-1" />
-                    {copied ? "Copied!" : "Copy"}
+                    Copy
                   </Button>
                 </div>
               )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <QrCode className="w-5 h-5 text-primary-600" />
+              <CardTitle>QR Code</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center gap-4">
+              <div id="qr-code" className="p-4 bg-white rounded-lg border border-gray-200">
+                <QRCodeCanvas value={qrLink} size={200} />
+              </div>
+              <p className="text-sm text-gray-500 text-center break-all max-w-md">
+                {qrLink}
+              </p>
+              <Button variant="secondary" onClick={handleDownloadQR}>
+                <Download className="w-4 h-4 mr-1" />
+                Download QR Code
+              </Button>
             </div>
           </CardContent>
         </Card>

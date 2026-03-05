@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Copy, Download, Image, FileText, Share2, Mail } from "lucide-react";
+import { SearchInput } from "@/components/ui/search-input";
+import { Tabs } from "@/components/ui/tabs";
+import { EmptyState } from "@/components/ui/empty-state";
+import { toast } from "@/components/ui/toast";
+import { Copy, Download, Image, FileText, Share2, Mail, FolderOpen } from "lucide-react";
 import { api } from "@/lib/api-client";
 import type { AffiliateAsset } from "@/types";
 
@@ -15,10 +19,20 @@ const typeIcons: Record<string, React.ReactNode> = {
   email: <Mail className="w-5 h-5" />,
 };
 
+const filterTabs = [
+  { key: "all", label: "All" },
+  { key: "banner", label: "Banner" },
+  { key: "text", label: "Text" },
+  { key: "social", label: "Social" },
+  { key: "email", label: "Email" },
+];
+
 export default function AffiliateResources() {
   const [assets, setAssets] = useState<AffiliateAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [activeType, setActiveType] = useState("all");
 
   useEffect(() => {
     async function load() {
@@ -33,6 +47,37 @@ export default function AffiliateResources() {
     }
     load();
   }, []);
+
+  const filteredAssets = useMemo(() => {
+    return assets.filter((asset) => {
+      const matchesType = activeType === "all" || asset.asset_type === activeType;
+      const matchesSearch = !search || asset.title.toLowerCase().includes(search.toLowerCase());
+      return matchesType && matchesSearch;
+    });
+  }, [assets, activeType, search]);
+
+  const handleCopy = async (asset: AffiliateAsset) => {
+    let textToCopy = "";
+    if (asset.asset_type === "banner" && asset.file_url) {
+      textToCopy = `<img src="${asset.file_url}" alt="${asset.title}" />`;
+    } else {
+      textToCopy = asset.content || asset.file_url || "";
+    }
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      toast.success("Copied to clipboard!");
+    } catch {
+      toast.error("Failed to copy to clipboard");
+    }
+  };
+
+  const handleDownload = (asset: AffiliateAsset) => {
+    if (asset.file_url) {
+      window.open(asset.file_url, "_blank");
+    } else {
+      toast.error("No file available for download");
+    }
+  };
 
   if (loading) {
     return (
@@ -61,13 +106,34 @@ export default function AffiliateResources() {
         </p>
       </div>
 
-      {assets.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          No resources available yet
+      <div className="mb-6 space-y-4">
+        <div className="max-w-sm">
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search resources..."
+          />
         </div>
+        <Tabs tabs={filterTabs} activeTab={activeType} onChange={setActiveType} />
+      </div>
+
+      {assets.length === 0 ? (
+        <EmptyState
+          icon={<FolderOpen className="w-6 h-6 text-gray-400" />}
+          title="No resources available yet"
+          description="Marketing materials will appear here once they are added."
+        />
+      ) : filteredAssets.length === 0 ? (
+        <EmptyState
+          icon={<FolderOpen className="w-6 h-6 text-gray-400" />}
+          title="No resources match your filter"
+          description="Try adjusting your search or filter to find what you're looking for."
+          actionLabel="Clear filters"
+          onAction={() => { setSearch(""); setActiveType("all"); }}
+        />
       ) : (
         <div className="grid md:grid-cols-2 gap-6">
-          {assets.map((asset) => (
+          {filteredAssets.map((asset) => (
             <Card key={asset.id}>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -102,11 +168,11 @@ export default function AffiliateResources() {
                   </p>
                 )}
                 <div className="flex gap-2">
-                  <Button variant="secondary" size="sm">
+                  <Button variant="secondary" size="sm" onClick={() => handleCopy(asset)}>
                     <Copy className="w-4 h-4 mr-1" /> Copy
                   </Button>
                   {(asset.asset_type === "banner" || asset.file_url) && (
-                    <Button variant="secondary" size="sm">
+                    <Button variant="secondary" size="sm" onClick={() => handleDownload(asset)}>
                       <Download className="w-4 h-4 mr-1" /> Download
                     </Button>
                   )}

@@ -13,6 +13,8 @@ import { StatCard } from "@/components/ui/stat-card";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/lib/api-client";
+import { formatCents, formatDate } from "@/lib/format";
+import { Skeleton, SkeletonCard } from "@/components/ui/loading-skeleton";
 import type { AffiliateStats, ReferralLink, AffiliateCommission } from "@/types";
 
 export default function AffiliateDashboard() {
@@ -44,8 +46,21 @@ export default function AffiliateDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-gray-500">Loading dashboard...</div>
+      <div>
+        <div className="mb-8">
+          <Skeleton className="h-8 w-64 mb-2" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+        <div className="grid lg:grid-cols-2 gap-6">
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
       </div>
     );
   }
@@ -86,14 +101,14 @@ export default function AffiliateDashboard() {
         />
         <StatCard
           label="Total Earnings"
-          value={`$${((stats?.total_earnings_cents ?? 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-          change={`$${((stats?.paid_earnings_cents ?? 0) / 100).toFixed(2)} paid`}
+          value={formatCents(stats?.total_earnings_cents ?? 0)}
+          change={`${formatCents(stats?.paid_earnings_cents ?? 0)} paid`}
           changeType="positive"
           icon={DollarSign}
         />
         <StatCard
           label="Pending Earnings"
-          value={`$${((stats?.pending_earnings_cents ?? 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          value={formatCents(stats?.pending_earnings_cents ?? 0)}
           changeType="neutral"
           icon={Clock}
         />
@@ -133,7 +148,7 @@ export default function AffiliateDashboard() {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">Member Since</span>
                 <span className="text-sm">
-                  {link?.created_at ? new Date(link.created_at).toLocaleDateString() : "—"}
+                  {formatDate(link?.created_at)}
                 </span>
               </div>
             </div>
@@ -159,16 +174,16 @@ export default function AffiliateDashboard() {
                   >
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        ${(comm.invoice_amount_cents / 100).toFixed(2)} sale
+                        {formatCents(comm.invoice_amount_cents)} sale
                       </p>
                       <p className="text-xs text-gray-500">
-                        {new Date(comm.created_at).toLocaleDateString()}
+                        {formatDate(comm.created_at)}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-semibold text-green-600 flex items-center gap-1">
-                        <ArrowUpRight className="w-3 h-3" />$
-                        {(comm.commission_amount_cents / 100).toFixed(2)}
+                        <ArrowUpRight className="w-3 h-3" />
+                        {formatCents(comm.commission_amount_cents)}
                       </p>
                       <Badge
                         variant={

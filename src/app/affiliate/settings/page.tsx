@@ -1,21 +1,41 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { toast } from "@/components/ui/toast";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { api } from "@/lib/api-client";
 import type { AffiliateProfile, ReferralLink } from "@/types";
+
+const paymentMethodOptions = [
+  { value: "paypal", label: "PayPal" },
+  { value: "stripe", label: "Stripe" },
+  { value: "bank_transfer", label: "Bank Transfer" },
+];
 
 export default function AffiliateSettings() {
   const [profile, setProfile] = useState<AffiliateProfile | null>(null);
   const [link, setLink] = useState<ReferralLink | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState("");
 
   const [displayName, setDisplayName] = useState("");
   const [payoutMethod, setPayoutMethod] = useState("");
   const [payoutEmail, setPayoutEmail] = useState("");
+
+  const isDirty = useMemo(() => {
+    if (!profile) return false;
+    return (
+      displayName !== (profile.display_name || "") ||
+      payoutMethod !== (profile.payout_method || "paypal") ||
+      payoutEmail !== (profile.payout_email || "")
+    );
+  }, [displayName, payoutMethod, payoutEmail, profile]);
+
+  useUnsavedChanges(isDirty);
 
   useEffect(() => {
     async function load() {
@@ -42,36 +62,34 @@ export default function AffiliateSettings() {
 
   const handleSaveProfile = async () => {
     setSaving(true);
-    setSaveMessage("");
     try {
-      await api.affiliate.updateProfile({
+      const updated = await api.affiliate.updateProfile({
         display_name: displayName || null,
       });
-      setSaveMessage("Profile saved successfully!");
+      setProfile(updated);
+      toast.success("Profile saved successfully!");
     } catch (err) {
       console.error("Failed to save profile:", err);
-      setSaveMessage("Failed to save profile.");
+      toast.error("Failed to save profile");
     } finally {
       setSaving(false);
-      setTimeout(() => setSaveMessage(""), 3000);
     }
   };
 
   const handleSavePayment = async () => {
     setSaving(true);
-    setSaveMessage("");
     try {
-      await api.affiliate.updateProfile({
+      const updated = await api.affiliate.updateProfile({
         payout_method: payoutMethod || null,
         payout_email: payoutEmail || null,
       });
-      setSaveMessage("Payment info updated successfully!");
+      setProfile(updated);
+      toast.success("Payment info updated!");
     } catch (err) {
       console.error("Failed to update payment info:", err);
-      setSaveMessage("Failed to update payment info.");
+      toast.error("Failed to update payment info");
     } finally {
       setSaving(false);
-      setTimeout(() => setSaveMessage(""), 3000);
     }
   };
 
@@ -92,12 +110,6 @@ export default function AffiliateSettings() {
         </p>
       </div>
 
-      {saveMessage && (
-        <div className="mb-4 p-3 rounded-lg bg-green-50 text-green-700 text-sm">
-          {saveMessage}
-        </div>
-      )}
-
       <div className="space-y-6 max-w-2xl">
         <Card>
           <CardHeader>
@@ -105,28 +117,18 @@ export default function AffiliateSettings() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Display Name
-                </label>
-                <input
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Referral Code
-                </label>
-                <input
-                  type="text"
-                  defaultValue={link?.ref_code || ""}
-                  disabled
-                  className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm"
-                />
-              </div>
+              <Input
+                label="Display Name"
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+              />
+              <Input
+                label="Referral Code"
+                type="text"
+                defaultValue={link?.ref_code || ""}
+                disabled
+              />
               <Button onClick={handleSaveProfile} disabled={saving}>
                 {saving ? "Saving..." : "Save Changes"}
               </Button>
@@ -140,31 +142,18 @@ export default function AffiliateSettings() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Payment Method
-                </label>
-                <select
-                  value={payoutMethod}
-                  onChange={(e) => setPayoutMethod(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                >
-                  <option value="paypal">PayPal</option>
-                  <option value="stripe">Stripe</option>
-                  <option value="bank_transfer">Bank Transfer</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Payment Email
-                </label>
-                <input
-                  type="email"
-                  value={payoutEmail}
-                  onChange={(e) => setPayoutEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                />
-              </div>
+              <Select
+                label="Payment Method"
+                options={paymentMethodOptions}
+                value={payoutMethod}
+                onChange={(e) => setPayoutMethod(e.target.value)}
+              />
+              <Input
+                label="Payment Email"
+                type="email"
+                value={payoutEmail}
+                onChange={(e) => setPayoutEmail(e.target.value)}
+              />
               <Button onClick={handleSavePayment} disabled={saving}>
                 {saving ? "Saving..." : "Update Payment Info"}
               </Button>

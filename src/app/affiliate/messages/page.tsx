@@ -4,28 +4,66 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Send, User, Shield } from "lucide-react";
+import { Modal } from "@/components/ui/modal";
+import { Textarea } from "@/components/ui/textarea";
+import { EmptyState } from "@/components/ui/empty-state";
+import { toast } from "@/components/ui/toast";
+import { Send, User, Shield, MessageSquare } from "lucide-react";
 import { api } from "@/lib/api-client";
+import { relativeTime } from "@/lib/format";
 import type { AffiliateMessage } from "@/types";
 
 export default function AffiliateMessages() {
   const [messages, setMessages] = useState<AffiliateMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [messageBody, setMessageBody] = useState("");
+  const [sending, setSending] = useState(false);
+
+  async function loadMessages() {
+    try {
+      const data = await api.affiliate.getMessages();
+      setMessages(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load messages");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function load() {
-      try {
-        const data = await api.affiliate.getMessages();
-        setMessages(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load messages");
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
+    loadMessages();
   }, []);
+
+  async function handleSend() {
+    if (!messageBody.trim()) return;
+    setSending(true);
+    try {
+      await api.affiliate.sendMessage(messageBody.trim());
+      toast.success("Message sent!");
+      setMessageBody("");
+      setModalOpen(false);
+      await loadMessages();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send message");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function handleMarkRead(id: string) {
+    try {
+      await api.affiliate.markMessageRead(id);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === id ? { ...m, is_read: true, read_at: new Date().toISOString() } : m
+        )
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to mark as read");
+    }
+  }
 
   if (loading) {
     return (
@@ -48,18 +86,30 @@ export default function AffiliateMessages() {
             Communication with the affiliate team
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setModalOpen(true)}>
           <Send className="w-4 h-4 mr-2" /> New Message
         </Button>
       </div>
 
       <div className="space-y-3">
         {messages.length === 0 && (
-          <p className="text-gray-500 text-center py-8">No messages yet.</p>
+          <EmptyState
+            icon={<MessageSquare className="w-6 h-6 text-gray-400" />}
+            title="No messages yet"
+            description="Start a conversation with the affiliate team."
+            actionLabel="New Message"
+            onAction={() => setModalOpen(true)}
+          />
         )}
         {messages.map((message) => (
-          <Card
+          <div
             key={message.id}
+            onClick={() => {
+              if (!message.is_read) handleMarkRead(message.id);
+            }}
+            className={!message.is_read ? "cursor-pointer" : ""}
+          >
+          <Card
             className={!message.is_read ? "border-primary-200 bg-primary-50/30" : ""}
           >
             <CardContent className="py-4">
@@ -88,15 +138,40 @@ export default function AffiliateMessages() {
                     {message.body}
                   </p>
                   <p className="text-xs text-gray-400 mt-2">
-                    {new Date(message.created_at).toLocaleDateString()} -{" "}
+                    {relativeTime(message.created_at)} -{" "}
                     {message.sender_role === "admin" ? "Admin" : "You"}
                   </p>
                 </div>
               </div>
             </CardContent>
           </Card>
+          </div>
         ))}
       </div>
+
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="New Message"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSend} disabled={sending || !messageBody.trim()}>
+              {sending ? "Sending..." : "Send"}
+            </Button>
+          </>
+        }
+      >
+        <Textarea
+          label="Message"
+          placeholder="Type your message..."
+          value={messageBody}
+          onChange={(e) => setMessageBody(e.target.value)}
+          rows={5}
+        />
+      </Modal>
     </div>
   );
 }
