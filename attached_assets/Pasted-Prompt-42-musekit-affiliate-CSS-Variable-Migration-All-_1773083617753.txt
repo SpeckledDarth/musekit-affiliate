@@ -1,0 +1,127 @@
+Prompt 42: musekit-affiliate — CSS Variable Migration (All Pages, Charts, Tailwind Config)
+Module Repl
+musekit-affiliate (GitHub: SpeckledDarth/musekit-affiliate)
+
+Context
+The affiliate package renders 11 pages for affiliate partners (dashboard, analytics, earnings, messages, news, payouts, referrals, resources, settings, support, tools). Its Tailwind config hardcodes hex values instead of using CSS variables. Charts in the analytics page use hardcoded hex colors. After Prompt 38 (ThemeInjector) and Prompt 39 (shared Tailwind preset), all CSS variables and mappings are available.
+
+Reference: See docs/current/css-variable-contract.md for the complete list of available CSS variables, their types, defaults, and recommended Tailwind class replacements.
+
+Current State (verified March 9, 2026)
+Tailwind Config — HARDCODED HEX
+tailwind.config.ts hardcodes colors:
+
+primary: {
+  50: "#eef2ff", 500: "#5c7cfa", 700: "#4263eb", 900: "#364fc7"
+  // ... full scale hardcoded
+},
+accent: {
+  50: "#fff0f6", 500: "#f06595", 700: "#d6336c", 900: "#a61e4d"
+  // ... full scale hardcoded
+}
+No CSS variable mappings, no fonts, no radius, no shadows.
+
+Chart Hardcoded Colors (CRITICAL)
+analytics/page.tsx:
+
+Clicks Area Chart: stroke="#4c6ef5", fill="#dbe4ff" (indigo/blue)
+Conversions Bar: fill="#4c6ef5" (indigo/blue)
+Revenue Bar: fill="#e64980" (pink/magenta)
+UI Components
+~10+ hardcoded color references in:
+
+src/components/ui/card.tsx — rounded-xl hardcoded
+src/components/ui/modal.tsx — hardcoded grays
+src/components/ui/toast.tsx — hardcoded colors
+Page Components
+11 page files in src/app/affiliate/ — each likely has hardcoded grays.
+
+The Fix
+1. Replace tailwind.config.ts Entirely
+Import the shared preset from @musekit/design-system:
+
+import { tailwindPreset } from "@musekit/design-system";
+const config = {
+  presets: [tailwindPreset],
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+  // ... keep existing plugins if any
+};
+This replaces ALL hardcoded hex colors with CSS variable mappings.
+
+2. Fix Analytics Charts
+Clicks Area Chart: Replace:
+
+<Area stroke="#4c6ef5" fill="#dbe4ff" ... />
+With:
+
+<Area stroke="var(--chart-primary)" fill="var(--primary-100)" ... />
+Conversions Bar: Replace:
+
+<Bar fill="#4c6ef5" ... />
+With:
+
+<Bar fill="var(--chart-primary)" ... />
+Revenue Bar: Replace:
+
+<Bar fill="#e64980" ... />
+With:
+
+<Bar fill="var(--chart-secondary)" ... />
+Also update radius={[4, 4, 0, 0]} to use var(--chart-bar-radius) if feasible (Recharts may need numeric values — if so, keep as-is since the CSS variable is numeric).
+
+3. Migrate UI Components
+Apply standard replacement rules to all files in src/components/ui/:
+
+bg-white → bg-background
+bg-gray-* → bg-muted / bg-accent
+text-gray-* → text-foreground / text-muted-foreground
+border-gray-* → border-border
+rounded-xl → rounded-lg
+4. Migrate Root App Page
+src/app/page.tsx — has rounded-xl on cards (lines 58, 79, 128). Already uses bg-card and border-border (good!). Replace rounded-xl → rounded-lg.
+
+5. Migrate ALL 11 Affiliate Portal Pages
+Every page file in src/app/affiliate/:
+
+page.tsx (dashboard)
+analytics/page.tsx (charts — see above)
+earnings/page.tsx
+messages/page.tsx
+news/page.tsx
+payouts/page.tsx
+referrals/page.tsx
+resources/page.tsx
+settings/page.tsx
+support/page.tsx
+tools/page.tsx — note: has bg-gray-900 text-gray-100 for code block display. Replace with bg-muted text-foreground or keep dark-on-light for code blocks if semantically appropriate.
+Replace all hardcoded colors, radii, and font references.
+
+6. Migrate Affiliate Admin Pages
+Files in src/app/admin/affiliates/:
+
+tiers/page.tsx — line 18: silver: "bg-gray-200 text-gray-700" tier badge color → replace with bg-muted text-muted-foreground
+page.tsx, layout.tsx — check for any hardcoded colors
+All subdirectories: applications/, assets/, broadcasts/, contests/, discount-codes/, members/, milestones/, networks/, payout-runs/, settings/
+What NOT to Do
+Do NOT change any Supabase queries, data logic, or affiliate calculations
+Do NOT change component APIs or export signatures
+Do NOT change chart data structures or logic — only chart colors
+Do NOT add or remove pages
+Verification Checklist
+Tailwind Config
+ tailwind.config.ts imports and uses tailwindPreset from @musekit/design-system
+ No hardcoded hex color values remain in tailwind.config.ts
+ grep -r "#[0-9a-fA-F]\{6\}" tailwind.config.ts returns zero results
+Charts
+ grep -r "#4c6ef5\|#dbe4ff\|#e64980" src/ returns zero results
+ analytics/page.tsx uses var(--chart-primary) and var(--chart-secondary)
+Hardcoded Color Elimination (includes admin pages)
+ grep -r "bg-white" src/ returns zero results
+ grep -r "bg-gray-" src/ returns zero results (except code block if kept intentionally)
+ grep -r "text-gray-" src/ returns zero results
+ grep -r "border-gray-" src/ returns zero results
+ grep -r "rounded-xl\|rounded-2xl" src/components/ returns zero results
+ grep -r "bg-gray-" src/app/admin/ returns zero results
+Build
+ npx tsc --noEmit passes with zero errors
+ All 11 page routes still render
