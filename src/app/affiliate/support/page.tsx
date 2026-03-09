@@ -186,8 +186,8 @@ export default function AffiliateSupport() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Support</h1>
-          <p className="text-gray-500 mt-1">Get help with your affiliate account</p>
+          <h1 className="text-2xl font-bold text-foreground">Support</h1>
+          <p className="text-muted-foreground mt-1">Get help with your affiliate account</p>
         </div>
         <Button onClick={() => setCreateOpen(true)}>
           <Plus className="w-4 h-4 mr-2" /> New Ticket
@@ -262,12 +262,12 @@ export default function AffiliateSupport() {
         {detailTicket && (
           <div className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-gray-500">Description</p>
-              <p className="mt-1 text-gray-900 whitespace-pre-wrap">{detailTicket.description}</p>
+              <p className="text-sm font-medium text-muted-foreground">Description</p>
+              <p className="mt-1 text-foreground whitespace-pre-wrap">{detailTicket.description}</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm font-medium text-gray-500">Status</p>
+                <p className="text-sm font-medium text-muted-foreground">Status</p>
                 <div className="mt-1">
                   <Badge
                     variant={
@@ -285,7 +285,7 @@ export default function AffiliateSupport() {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Priority</p>
+                <p className="text-sm font-medium text-muted-foreground">Priority</p>
                 <div className="mt-1">
                   <Badge
                     variant={
@@ -301,34 +301,34 @@ export default function AffiliateSupport() {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Category</p>
-                <p className="mt-1 text-gray-900">{detailTicket.category ?? "—"}</p>
+                <p className="text-sm font-medium text-muted-foreground">Category</p>
+                <p className="mt-1 text-foreground">{detailTicket.category ?? "—"}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Ticket Number</p>
-                <p className="mt-1 text-gray-900">{detailTicket.ticket_number ?? "—"}</p>
+                <p className="text-sm font-medium text-muted-foreground">Ticket Number</p>
+                <p className="mt-1 text-foreground">{detailTicket.ticket_number ?? "—"}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Created</p>
-                <p className="mt-1 text-gray-900">{formatDate(detailTicket.created_at)}</p>
+                <p className="text-sm font-medium text-muted-foreground">Created</p>
+                <p className="mt-1 text-foreground">{formatDate(detailTicket.created_at)}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Updated</p>
-                <p className="mt-1 text-gray-900">{formatDate(detailTicket.updated_at)}</p>
+                <p className="text-sm font-medium text-muted-foreground">Updated</p>
+                <p className="mt-1 text-foreground">{formatDate(detailTicket.updated_at)}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Resolved</p>
-                <p className="mt-1 text-gray-900">{formatDate(detailTicket.resolved_at)}</p>
+                <p className="text-sm font-medium text-muted-foreground">Resolved</p>
+                <p className="mt-1 text-foreground">{formatDate(detailTicket.resolved_at)}</p>
               </div>
             </div>
 
             <div className="border-t pt-4">
-              <p className="text-sm font-medium text-gray-500 mb-3">Replies</p>
+              <p className="text-sm font-medium text-muted-foreground mb-3">Replies</p>
               <div className="max-h-64 overflow-y-auto space-y-3 mb-4">
                 {repliesLoading ? (
-                  <p className="text-sm text-gray-400">Loading replies...</p>
+                  <p className="text-sm text-muted-foreground">Loading replies...</p>
                 ) : replies.length === 0 ? (
-                  <p className="text-sm text-gray-400">No replies yet.</p>
+                  <p className="text-sm text-muted-foreground">No replies yet.</p>
                 ) : (
                   replies.map((reply) => (
                     <div
@@ -336,18 +336,18 @@ export default function AffiliateSupport() {
                       className={`p-3 rounded-lg text-sm ${
                         reply.sender_role === "affiliate"
                           ? "bg-blue-50 border border-blue-100 ml-8"
-                          : "bg-gray-50 border border-gray-100 mr-8"
+                          : "bg-muted border border-border mr-8"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-gray-700">
+                        <span className="font-medium text-foreground">
                           {reply.sender_role === "affiliate" ? "You" : "Support"}
                         </span>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-muted-foreground">
                           {formatDate(reply.created_at)}
                         </span>
                       </div>
-                      <p className="text-gray-900 whitespace-pre-wrap">{reply.body}</p>
+                      <p className="text-foreground whitespace-pre-wrap">{reply.body}</p>
                     </div>
                   ))
                 )}

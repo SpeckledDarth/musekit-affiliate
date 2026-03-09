@@ -95,21 +95,21 @@ export default function AdminAffiliateBroadcasts() {
       <div>
         <div className="flex items-center justify-between mb-8">
           <div>
-            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-            <div className="h-4 w-64 bg-gray-200 rounded animate-pulse mt-2" />
+            <div className="h-8 w-48 bg-muted rounded animate-pulse" />
+            <div className="h-4 w-64 bg-muted rounded animate-pulse mt-2" />
           </div>
-          <div className="h-10 w-40 bg-gray-200 rounded animate-pulse" />
+          <div className="h-10 w-40 bg-muted rounded animate-pulse" />
         </div>
         <div className="space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i}>
               <CardContent className="py-4">
                 <div className="flex items-start gap-4 animate-pulse">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0" />
+                  <div className="w-10 h-10 bg-muted rounded-full flex-shrink-0" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-5 w-1/3 bg-gray-200 rounded" />
-                    <div className="h-4 w-2/3 bg-gray-200 rounded" />
-                    <div className="h-3 w-1/4 bg-gray-200 rounded" />
+                    <div className="h-5 w-1/3 bg-muted rounded" />
+                    <div className="h-4 w-2/3 bg-muted rounded" />
+                    <div className="h-3 w-1/4 bg-muted rounded" />
                   </div>
                 </div>
               </CardContent>
@@ -132,8 +132,8 @@ export default function AdminAffiliateBroadcasts() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Broadcasts</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Broadcasts</h1>
+          <p className="text-muted-foreground mt-1">
             Send announcements to all affiliates
           </p>
         </div>
@@ -153,7 +153,7 @@ export default function AdminAffiliateBroadcasts() {
       <div className="space-y-4">
         {filteredBroadcasts.length === 0 ? (
           <Card>
-            <CardContent className="py-8 text-center text-gray-500">
+            <CardContent className="py-8 text-center text-muted-foreground">
               {search ? "No broadcasts match your search." : "No broadcasts yet."}
             </CardContent>
           </Card>
@@ -167,17 +167,17 @@ export default function AdminAffiliateBroadcasts() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-foreground">
                         {broadcast.subject}
                       </h3>
                       {broadcast.category && (
                         <Badge variant="info">{broadcast.category}</Badge>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       {broadcast.body}
                     </p>
-                    <div className="flex items-center gap-4 mt-3 text-xs text-gray-400">
+                    <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
                       <span>
                         {formatDate(broadcast.sent_at || broadcast.created_at)}
                       </span>
@@ -231,13 +231,13 @@ export default function AdminAffiliateBroadcasts() {
             placeholder="Write your broadcast message..."
           />
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Category (optional)
             </label>
             <select
               value={form.category}
               onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-              className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary-500"
             >
               <option value="">None</option>
               <option value="announcement">Announcement</option>

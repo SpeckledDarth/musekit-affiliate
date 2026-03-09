@@ -122,20 +122,20 @@ export default function AdminAffiliateContests() {
       <div className="space-y-4">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <div className="h-7 w-40 bg-gray-200 rounded animate-pulse" />
-            <div className="h-4 w-64 bg-gray-200 rounded animate-pulse mt-2" />
+            <div className="h-7 w-40 bg-muted rounded animate-pulse" />
+            <div className="h-4 w-64 bg-muted rounded animate-pulse mt-2" />
           </div>
-          <div className="h-10 w-36 bg-gray-200 rounded animate-pulse" />
+          <div className="h-10 w-36 bg-muted rounded animate-pulse" />
         </div>
         {Array.from({ length: 3 }).map((_, i) => (
           <Card key={i}>
             <CardContent className="py-5">
               <div className="flex items-start gap-4 animate-pulse">
-                <div className="w-12 h-12 bg-gray-200 rounded-lg" />
+                <div className="w-12 h-12 bg-muted rounded-lg" />
                 <div className="flex-1 space-y-3">
-                  <div className="h-5 w-48 bg-gray-200 rounded" />
-                  <div className="h-4 w-full bg-gray-200 rounded" />
-                  <div className="h-3 w-32 bg-gray-200 rounded" />
+                  <div className="h-5 w-48 bg-muted rounded" />
+                  <div className="h-4 w-full bg-muted rounded" />
+                  <div className="h-3 w-32 bg-muted rounded" />
                 </div>
               </div>
             </CardContent>
@@ -157,8 +157,8 @@ export default function AdminAffiliateContests() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Contests</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Contests</h1>
+          <p className="text-muted-foreground mt-1">
             Manage promotional campaigns and contests
           </p>
         </div>
@@ -170,7 +170,7 @@ export default function AdminAffiliateContests() {
       <div className="space-y-4">
         {contests.length === 0 ? (
           <Card>
-            <CardContent className="py-8 text-center text-gray-500">
+            <CardContent className="py-8 text-center text-muted-foreground">
               No contests yet.
             </CardContent>
           </Card>
@@ -184,7 +184,7 @@ export default function AdminAffiliateContests() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-foreground">
                         {contest.name}
                       </h3>
                       <Badge
@@ -200,19 +200,19 @@ export default function AdminAffiliateContests() {
                       </Badge>
                     </div>
                     {contest.description && (
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {contest.description}
                       </p>
                     )}
                     <div className="flex items-center gap-4 mt-3">
-                      <span className="flex items-center gap-1 text-xs text-gray-500">
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Calendar className="w-3 h-3" />
                         {formatDate(contest.start_date)} – {formatDate(contest.end_date)}
                       </span>
                       <Badge variant="info">Metric: {contest.metric}</Badge>
                     </div>
                     {(contest.prize_description || contest.prize_amount_cents) && (
-                      <p className="text-sm text-gray-600 mt-2">
+                      <p className="text-sm text-muted-foreground mt-2">
                         <span className="font-medium">Prize:</span>{" "}
                         {contest.prize_description}
                         {contest.prize_amount_cents != null && contest.prize_amount_cents > 0 && (
@@ -270,7 +270,7 @@ export default function AdminAffiliateContests() {
             placeholder="Contest name"
           />
           <div className="w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Description
             </label>
             <textarea
@@ -278,17 +278,17 @@ export default function AdminAffiliateContests() {
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               placeholder="Contest description"
               rows={3}
-              className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary-500"
             />
           </div>
           <div className="w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Metric
             </label>
             <select
               value={form.metric}
               onChange={(e) => setForm((f) => ({ ...f, metric: e.target.value }))}
-              className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary-500"
             >
               {METRIC_OPTIONS.map((m) => (
                 <option key={m} value={m}>

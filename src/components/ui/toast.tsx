@@ -11,7 +11,7 @@ export function ToastProvider() {
       toastOptions={{
         duration: 4000,
         classNames: {
-          toast: "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg text-gray-900 dark:text-gray-100",
+          toast: "bg-card border border-border rounded-xl shadow-lg text-card-foreground",
         },
       }}
     />

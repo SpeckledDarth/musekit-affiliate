@@ -1,0 +1,121 @@
+Prompt 35: Refactor Hardcoded Grays to Semantic CSS Variables
+Context
+Production Target
+Next.js 14.2.18 (App Router) + Supabase + Vercel
+This module lives at packages/affiliate/ in a Turborepo monorepo
+Current State (verified against live code March 9, 2026)
+Root layout (src/app/layout.tsx line 18):
+
+<body className="min-h-screen bg-gray-50 dark:bg-gray-900 antialiased">
+Affiliate layout (src/app/affiliate/layout.tsx line 45):
+
+<main className="flex-1 bg-gray-50 dark:bg-gray-900">
+Sidebar (src/components/ui/sidebar.tsx): Uses hardcoded grays throughout.
+
+Supabase client (src/lib/supabase.ts): Uses ! non-null assertion — crashes unhelpfully. Exports: supabase, getServiceClient.
+
+Problem
+Hardcoded Tailwind grays cannot be influenced by CSS variables. When the palette changes colors, the affiliate dashboard is unaffected. The rest of the app uses semantic classes (bg-background, text-foreground) that read from CSS variables.
+
+Fix — Replace Hardcoded Grays with Semantic Classes
+Mapping Table
+Hardcoded Class	Replacement
+bg-white	bg-background
+bg-gray-50	bg-background
+dark:bg-gray-900	(remove — bg-background handles dark mode)
+dark:bg-gray-950	(remove)
+bg-gray-100	bg-muted
+dark:bg-gray-800	(remove)
+bg-gray-800 (card bg in dark)	bg-card
+text-gray-900	text-foreground
+dark:text-white	(remove)
+dark:text-gray-100	(remove)
+text-gray-600	text-muted-foreground
+text-gray-500	text-muted-foreground
+text-gray-400	text-muted-foreground
+dark:text-gray-400	(remove)
+dark:text-gray-300	(remove)
+border-gray-200	border-border
+border-gray-100	border-border
+dark:border-gray-700	(remove)
+dark:border-gray-600	(remove)
+divide-gray-200	divide-border
+dark:divide-gray-700	(remove)
+hover:bg-gray-*	hover:bg-muted or hover:bg-accent
+focus:ring-gray-*	focus:ring-ring
+Files to Change (highest priority)
+src/app/layout.tsx — body class
+src/app/affiliate/layout.tsx — main area
+src/components/ui/sidebar.tsx — sidebar bg, text, borders
+All .tsx files in src/app/affiliate/ and src/app/admin/affiliates/
+Do NOT Change
+bg-primary-* / text-primary-* — intentional brand colors
+bg-green-*, bg-red-*, bg-yellow-*, bg-blue-* — semantic status colors
+Any inline style attributes
+Card surfaces specifically
+bg-white dark:bg-gray-800 → bg-card text-card-foreground
+Also: Update Supabase Client
+File: src/lib/supabase.ts
+Replace ! non-null assertions. Preserve existing export names (supabase, getServiceClient):
+
+import { createBrowserClient, createAdminClient } from "@musekit/database";
+let _browserClient: ReturnType<typeof createBrowserClient> | null = null;
+function getBrowserClient() {
+  if (_browserClient) return _browserClient;
+  try {
+    _browserClient = createBrowserClient();
+    return _browserClient;
+  } catch (error) {
+    console.error("Affiliate: Failed to create Supabase client:", error);
+    throw error;
+  }
+}
+export const supabase = getBrowserClient();
+export function getServiceClient() {
+  try {
+    return createAdminClient();
+  } catch (error) {
+    console.error("Affiliate: Failed to create Supabase admin client:", error);
+    throw error;
+  }
+}
+Critical Rules
+This is a CSS class replacement only — do NOT change component logic, props, state, or structure
+Remove the corresponding dark: modifier when replacing a gray class — semantic classes handle dark mode via CSS variables
+Do NOT replace status/semantic colors (green, red, yellow, blue)
+Do NOT replace primary-* classes
+Preserve existing supabase.ts export names: supabase, getServiceClient
+Verification
+No grays in layout files
+grep -rn "bg-gray-50\|bg-gray-900\|bg-gray-950" src/app/layout.tsx src/app/affiliate/layout.tsx
+Expected: 0 results.
+
+No gray text in layout files
+grep -rn "text-gray-900\|text-gray-600\|dark:text-white" src/app/layout.tsx src/app/affiliate/layout.tsx
+Expected: 0 results.
+
+Semantic classes present
+grep -rn "bg-background\|text-foreground\|border-border" src/app/layout.tsx src/app/affiliate/layout.tsx
+Expected: multiple results.
+
+Total remaining grays (document count, some acceptable in non-layout files)
+grep -rn "bg-gray-\|text-gray-\|border-gray-" src/ | grep -v node_modules | wc -l
+Supabase uses @musekit/database
+grep -n "@musekit/database" src/lib/supabase.ts
+Expected: at least 1 result.
+
+Per-file checklist
+ src/app/layout.tsx — body uses bg-background not bg-gray-50 dark:bg-gray-900
+ src/app/affiliate/layout.tsx — main uses bg-background not bg-gray-50 dark:bg-gray-900
+ src/components/ui/sidebar.tsx — uses semantic classes
+ src/lib/supabase.ts — uses @musekit/database, preserves supabase and getServiceClient exports
+ No component logic changed — only CSS class names
+ Status colors NOT changed
+ Primary brand colors NOT changed
+TypeScript compiles
+npx tsc --noEmit
+Expected: no errors.
+
+Runtime checks
+Affiliate dashboard looks visually identical (semantic classes produce same default colors)
+Dark mode toggle still works

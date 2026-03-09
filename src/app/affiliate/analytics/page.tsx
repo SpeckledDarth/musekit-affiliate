@@ -94,7 +94,7 @@ export default function AffiliateAnalytics() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-gray-500">Loading analytics...</div>
+        <div className="text-muted-foreground">Loading analytics...</div>
       </div>
     );
   }
@@ -116,8 +116,8 @@ export default function AffiliateAnalytics() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
+        <p className="text-muted-foreground mt-1">
           Track your clicks, conversions, and revenue over time
         </p>
       </div>
@@ -137,19 +137,19 @@ export default function AffiliateAnalytics() {
 
       <div className="grid lg:grid-cols-3 gap-4 mb-8">
         <Card className="p-4">
-          <p className="text-sm text-gray-500">Avg. Daily Clicks</p>
+          <p className="text-sm text-muted-foreground">Avg. Daily Clicks</p>
           <p className="text-2xl font-bold">
             {totalClicks > 0 ? Math.round(totalClicks / divisor) : 0}
           </p>
         </Card>
         <Card className="p-4">
-          <p className="text-sm text-gray-500">Avg. Daily Referrals</p>
+          <p className="text-sm text-muted-foreground">Avg. Daily Referrals</p>
           <p className="text-2xl font-bold">
             {totalReferrals > 0 ? Math.round(totalReferrals / divisor) : 0}
           </p>
         </Card>
         <Card className="p-4">
-          <p className="text-sm text-gray-500">Avg. Daily Revenue</p>
+          <p className="text-sm text-muted-foreground">Avg. Daily Revenue</p>
           <p className="text-2xl font-bold">
             {formatCents(totalEarningsCents > 0 ? Math.round(totalEarningsCents / divisor) : 0)}
           </p>

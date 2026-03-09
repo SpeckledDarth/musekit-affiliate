@@ -72,8 +72,8 @@ export default function AffiliateTools() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Affiliate Tools</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Affiliate Tools</h1>
+        <p className="text-muted-foreground mt-1">
           Generate tracking links and embed codes
         </p>
       </div>
@@ -104,7 +104,7 @@ export default function AffiliateTools() {
                     type="text"
                     readOnly
                     value={generatedLink}
-                    className="flex-1 bg-gray-50 font-mono"
+                    className="flex-1 bg-muted font-mono"
                   />
                   <Button
                     variant="secondary"
@@ -128,10 +128,10 @@ export default function AffiliateTools() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center gap-4">
-              <div id="qr-code" className="p-4 bg-white rounded-lg border border-gray-200">
+              <div id="qr-code" className="p-4 bg-background rounded-lg border border-border">
                 <QRCodeCanvas value={qrLink} size={200} />
               </div>
-              <p className="text-sm text-gray-500 text-center break-all max-w-md">
+              <p className="text-sm text-muted-foreground text-center break-all max-w-md">
                 {qrLink}
               </p>
               <Button variant="secondary" onClick={handleDownloadQR}>

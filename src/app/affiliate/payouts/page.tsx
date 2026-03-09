@@ -100,8 +100,8 @@ export default function AffiliatePayouts() {
     return (
       <div>
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Payouts</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Payouts</h1>
+          <p className="text-muted-foreground mt-1">
             View your pending and completed payouts
           </p>
         </div>
@@ -121,8 +121,8 @@ export default function AffiliatePayouts() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Payouts</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Payouts</h1>
+        <p className="text-muted-foreground mt-1">
           View your pending and completed payouts
         </p>
       </div>
@@ -149,15 +149,15 @@ export default function AffiliatePayouts() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Amount</p>
-                <p className="text-lg font-semibold text-gray-900">{formatCents(selected.amount_cents)}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Amount</p>
+                <p className="text-lg font-semibold text-foreground">{formatCents(selected.amount_cents)}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Method</p>
-                <p className="text-sm text-gray-900 capitalize">{selected.method?.replace("_", " ")}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Method</p>
+                <p className="text-sm text-foreground capitalize">{selected.method?.replace("_", " ")}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Status</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Status</p>
                 <div className="mt-1">
                   <Badge variant={statusVariant(selected.status)}>
                     {selected.status}
@@ -165,22 +165,22 @@ export default function AffiliatePayouts() {
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Created</p>
-                <p className="text-sm text-gray-900">{formatDate(selected.created_at)}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Created</p>
+                <p className="text-sm text-foreground">{formatDate(selected.created_at)}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Processed</p>
-                <p className="text-sm text-gray-900">{formatDate(selected.processed_at)}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Processed</p>
+                <p className="text-sm text-foreground">{formatDate(selected.processed_at)}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Batch ID</p>
-                <p className="text-sm text-gray-900 font-mono">{selected.batch_id || "—"}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Batch ID</p>
+                <p className="text-sm text-foreground font-mono">{selected.batch_id || "—"}</p>
               </div>
             </div>
             {selected.notes && (
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Notes</p>
-                <p className="text-sm text-gray-900 mt-1">{selected.notes}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Notes</p>
+                <p className="text-sm text-foreground mt-1">{selected.notes}</p>
               </div>
             )}
           </div>

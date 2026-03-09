@@ -102,15 +102,15 @@ export default function AffiliateEarnings() {
     return (
       <div>
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Earnings</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Earnings</h1>
+          <p className="text-muted-foreground mt-1">
             View your commission earnings history
           </p>
         </div>
         <div className="grid sm:grid-cols-3 gap-6 mb-8">
-          <div className="h-24 bg-gray-100 rounded-lg animate-pulse" />
-          <div className="h-24 bg-gray-100 rounded-lg animate-pulse" />
-          <div className="h-24 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="h-24 bg-muted rounded-lg animate-pulse" />
+          <div className="h-24 bg-muted rounded-lg animate-pulse" />
+          <div className="h-24 bg-muted rounded-lg animate-pulse" />
         </div>
         <SkeletonTable columns={5} rows={5} />
       </div>
@@ -128,8 +128,8 @@ export default function AffiliateEarnings() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Earnings</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Earnings</h1>
+        <p className="text-muted-foreground mt-1">
           View your commission earnings history
         </p>
       </div>

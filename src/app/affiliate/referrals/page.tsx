@@ -51,7 +51,7 @@ export default function AffiliateReferrals() {
       key: "ref_code",
       header: "Ref Code",
       render: (item: AffiliateReferral) => (
-        <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+        <code className="text-xs bg-muted px-2 py-1 rounded">
           {item.ref_code}
         </code>
       ),
@@ -93,8 +93,8 @@ export default function AffiliateReferrals() {
     return (
       <div>
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Referrals</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Referrals</h1>
+          <p className="text-muted-foreground mt-1">
             Track all your referred visitors and their conversion status
           </p>
         </div>
@@ -115,8 +115,8 @@ export default function AffiliateReferrals() {
     return (
       <div>
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Referrals</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Referrals</h1>
+          <p className="text-muted-foreground mt-1">
             Track all your referred visitors and their conversion status
           </p>
         </div>
@@ -131,8 +131,8 @@ export default function AffiliateReferrals() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Referrals</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Referrals</h1>
+        <p className="text-muted-foreground mt-1">
           Track all your referred visitors and their conversion status
         </p>
       </div>
@@ -165,13 +165,13 @@ export default function AffiliateReferrals() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Ref Code</p>
-                <code className="text-sm bg-gray-100 px-2 py-1 rounded mt-1 inline-block">
+                <p className="text-xs font-medium text-muted-foreground uppercase">Ref Code</p>
+                <code className="text-sm bg-muted px-2 py-1 rounded mt-1 inline-block">
                   {selectedReferral.ref_code}
                 </code>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Status</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Status</p>
                 <div className="mt-1">
                   <Badge variant={statusBadgeVariant(selectedReferral.status)}>
                     {selectedReferral.status}
@@ -179,46 +179,46 @@ export default function AffiliateReferrals() {
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Source Tag</p>
-                <p className="text-sm text-gray-900 mt-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase">Source Tag</p>
+                <p className="text-sm text-foreground mt-1">
                   {selectedReferral.source_tag || "—"}
                 </p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Created</p>
-                <p className="text-sm text-gray-900 mt-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase">Created</p>
+                <p className="text-sm text-foreground mt-1">
                   {formatDate(selectedReferral.created_at)}
                 </p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Converted</p>
-                <p className="text-sm text-gray-900 mt-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase">Converted</p>
+                <p className="text-sm text-foreground mt-1">
                   {formatDate(selectedReferral.converted_at)}
                 </p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Health Status</p>
-                <p className="text-sm text-gray-900 mt-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase">Health Status</p>
+                <p className="text-sm text-foreground mt-1">
                   {selectedReferral.health_status || "—"}
                 </p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Fraud Flags</p>
-                <p className="text-sm text-gray-900 mt-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase">Fraud Flags</p>
+                <p className="text-sm text-foreground mt-1">
                   {selectedReferral.fraud_flags && selectedReferral.fraud_flags.length > 0
                     ? selectedReferral.fraud_flags.join(", ")
                     : "None"}
                 </p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Last Active</p>
-                <p className="text-sm text-gray-900 mt-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase">Last Active</p>
+                <p className="text-sm text-foreground mt-1">
                   {relativeTime(selectedReferral.last_active_at)}
                 </p>
               </div>
               <div className="col-span-2">
-                <p className="text-xs font-medium text-gray-500 uppercase">Churn Reason</p>
-                <p className="text-sm text-gray-900 mt-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase">Churn Reason</p>
+                <p className="text-sm text-foreground mt-1">
                   {selectedReferral.churn_reason || "—"}
                 </p>
               </div>

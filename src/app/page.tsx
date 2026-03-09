@@ -13,26 +13,26 @@ import {
 export default function HomePage() {
   return (
     <div className="min-h-screen">
-      <nav className="bg-white border-b border-gray-200 px-6 py-4">
+      <nav className="bg-card border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
               <Zap className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">
+            <span className="text-xl font-bold text-foreground">
               MuseKit Affiliate
             </span>
           </div>
           <div className="flex items-center gap-4">
             <Link
               href="/affiliate"
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Affiliate Dashboard
             </Link>
             <Link
               href="/admin/affiliates"
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Admin Panel
             </Link>
@@ -42,10 +42,10 @@ export default function HomePage() {
 
       <main className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             MuseKit Affiliate Program
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Earn commissions by referring creators and musicians to MuseKit.
             Track your referrals, manage payouts, and grow your affiliate
             business.
@@ -55,17 +55,17 @@ export default function HomePage() {
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           <Link
             href="/affiliate"
-            className="group bg-white rounded-xl border border-gray-200 p-8 hover:border-primary-400 hover:shadow-lg transition-all"
+            className="group bg-card rounded-xl border border-border p-8 hover:border-primary-400 hover:shadow-lg transition-all"
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
                 <BarChart3 className="w-6 h-6 text-primary-600" />
               </div>
-              <h2 className="text-2xl font-semibold text-gray-900">
+              <h2 className="text-2xl font-semibold text-foreground">
                 Affiliate Dashboard
               </h2>
             </div>
-            <p className="text-gray-600 mb-4">
+            <p className="text-muted-foreground mb-4">
               View your earnings, track referrals, access marketing materials,
               and manage your affiliate account.
             </p>
@@ -76,17 +76,17 @@ export default function HomePage() {
 
           <Link
             href="/admin/affiliates"
-            className="group bg-white rounded-xl border border-gray-200 p-8 hover:border-accent-400 hover:shadow-lg transition-all"
+            className="group bg-card rounded-xl border border-border p-8 hover:border-accent-400 hover:shadow-lg transition-all"
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-accent-100 rounded-lg flex items-center justify-center">
                 <Shield className="w-6 h-6 text-accent-600" />
               </div>
-              <h2 className="text-2xl font-semibold text-gray-900">
+              <h2 className="text-2xl font-semibold text-foreground">
                 Admin Panel
               </h2>
             </div>
-            <p className="text-gray-600 mb-4">
+            <p className="text-muted-foreground mb-4">
               Manage applications, set commission rates, process payouts, and
               oversee the affiliate program.
             </p>
@@ -125,13 +125,13 @@ export default function HomePage() {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="bg-white rounded-xl border border-gray-200 p-6"
+              className="bg-card rounded-xl border border-border p-6"
             >
               <div className="flex items-center gap-3 mb-2">
-                <stat.icon className="w-5 h-5 text-gray-400" />
-                <span className="text-sm text-gray-500">{stat.label}</span>
+                <stat.icon className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">{stat.label}</span>
               </div>
-              <span className="text-2xl font-bold text-gray-900">
+              <span className="text-2xl font-bold text-foreground">
                 {stat.value}
               </span>
             </div>

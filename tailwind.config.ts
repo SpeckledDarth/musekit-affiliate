@@ -10,7 +10,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        border: "hsl(var(--border))",
+        ring: "hsl(var(--ring))",
         primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
           50: "#f0f4ff",
           100: "#dbe4ff",
           200: "#bac8ff",
@@ -23,6 +45,8 @@ const config: Config = {
           900: "#364fc7",
         },
         accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
           50: "#fff0f6",
           100: "#ffdeeb",
           200: "#fcc2d7",
@@ -34,6 +58,12 @@ const config: Config = {
           800: "#c2255c",
           900: "#a61e4d",
         },
+      },
+      borderColor: {
+        DEFAULT: "hsl(var(--border))",
+      },
+      ringColor: {
+        DEFAULT: "hsl(var(--ring))",
       },
     },
   },

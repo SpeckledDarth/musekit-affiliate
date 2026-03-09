@@ -44,7 +44,7 @@ export default function AffiliateMembers() {
       render: (item: AffiliateListItem) => (
         <div>
           <p className="font-medium">{item.profile?.full_name || item.ref_code}</p>
-          <p className="text-xs text-gray-500">{item.profile?.email || "—"}</p>
+          <p className="text-xs text-muted-foreground">{item.profile?.email || "—"}</p>
         </div>
       ),
     },
@@ -109,10 +109,10 @@ export default function AffiliateMembers() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-foreground">
           Affiliate Members
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-muted-foreground mt-1">
           Active affiliates with performance stats
         </p>
       </div>
@@ -145,25 +145,25 @@ export default function AffiliateMembers() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Full Name</p>
-                <p className="text-sm text-gray-900 mt-1">{detailMember.profile?.full_name || "—"}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Full Name</p>
+                <p className="text-sm text-foreground mt-1">{detailMember.profile?.full_name || "—"}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Email</p>
-                <p className="text-sm text-gray-900 mt-1">{detailMember.profile?.email || "—"}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Email</p>
+                <p className="text-sm text-foreground mt-1">{detailMember.profile?.email || "—"}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Ref Code</p>
-                <p className="text-sm text-gray-900 mt-1 font-mono">{detailMember.ref_code}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Ref Code</p>
+                <p className="text-sm text-foreground mt-1 font-mono">{detailMember.ref_code}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Role</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Role</p>
                 <p className="text-sm mt-1">
                   <Badge variant="primary">{detailMember.affiliate_role.toUpperCase()}</Badge>
                 </p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Status</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Status</p>
                 <p className="text-sm mt-1">
                   <Badge variant={detailMember.suspended ? "danger" : "success"}>
                     {detailMember.suspended ? "Suspended" : "Active"}
@@ -171,28 +171,28 @@ export default function AffiliateMembers() {
                 </p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Signups</p>
-                <p className="text-sm text-gray-900 mt-1">{detailMember.signups.toLocaleString()}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Signups</p>
+                <p className="text-sm text-foreground mt-1">{detailMember.signups.toLocaleString()}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Clicks</p>
-                <p className="text-sm text-gray-900 mt-1">{detailMember.clicks.toLocaleString()}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Clicks</p>
+                <p className="text-sm text-foreground mt-1">{detailMember.clicks.toLocaleString()}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Total Earnings</p>
-                <p className="text-sm text-gray-900 mt-1 font-semibold">{formatCents(detailMember.total_earnings_cents)}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Total Earnings</p>
+                <p className="text-sm text-foreground mt-1 font-semibold">{formatCents(detailMember.total_earnings_cents)}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Pending Earnings</p>
-                <p className="text-sm text-gray-900 mt-1">{formatCents(detailMember.pending_earnings_cents)}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Pending Earnings</p>
+                <p className="text-sm text-foreground mt-1">{formatCents(detailMember.pending_earnings_cents)}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Commission Rate</p>
-                <p className="text-sm text-gray-900 mt-1">{detailMember.locked_commission_rate != null ? `${detailMember.locked_commission_rate}%` : "—"}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Commission Rate</p>
+                <p className="text-sm text-foreground mt-1">{detailMember.locked_commission_rate != null ? `${detailMember.locked_commission_rate}%` : "—"}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase">Joined</p>
-                <p className="text-sm text-gray-900 mt-1">{formatDate(detailMember.created_at)}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Joined</p>
+                <p className="text-sm text-foreground mt-1">{formatDate(detailMember.created_at)}</p>
               </div>
             </div>
           </div>

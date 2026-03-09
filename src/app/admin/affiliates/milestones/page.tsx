@@ -111,23 +111,23 @@ export default function AdminAffiliateMilestones() {
       <div>
         <div className="flex items-center justify-between mb-8">
           <div>
-            <div className="h-7 w-40 bg-gray-200 rounded animate-pulse" />
-            <div className="h-4 w-64 bg-gray-200 rounded animate-pulse mt-2" />
+            <div className="h-7 w-40 bg-muted rounded animate-pulse" />
+            <div className="h-4 w-64 bg-muted rounded animate-pulse mt-2" />
           </div>
-          <div className="h-10 w-36 bg-gray-200 rounded-lg animate-pulse" />
+          <div className="h-10 w-36 bg-muted rounded-lg animate-pulse" />
         </div>
         <div className="grid md:grid-cols-2 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i}>
               <CardContent className="py-5">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg animate-pulse flex-shrink-0" />
+                  <div className="w-12 h-12 bg-muted rounded-lg animate-pulse flex-shrink-0" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />
-                    <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-5 w-32 bg-muted rounded animate-pulse" />
+                    <div className="h-4 w-48 bg-muted rounded animate-pulse" />
                     <div className="flex gap-2 mt-3">
-                      <div className="h-5 w-24 bg-gray-200 rounded-full animate-pulse" />
-                      <div className="h-5 w-20 bg-gray-200 rounded-full animate-pulse" />
+                      <div className="h-5 w-24 bg-muted rounded-full animate-pulse" />
+                      <div className="h-5 w-20 bg-muted rounded-full animate-pulse" />
                     </div>
                   </div>
                 </div>
@@ -151,8 +151,8 @@ export default function AdminAffiliateMilestones() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Milestones</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Milestones</h1>
+          <p className="text-muted-foreground mt-1">
             Define achievements and rewards for affiliates
           </p>
         </div>
@@ -163,7 +163,7 @@ export default function AdminAffiliateMilestones() {
 
       {milestones.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center text-gray-500">
+          <CardContent className="py-12 text-center text-muted-foreground">
             No milestones defined yet
           </CardContent>
         </Card>
@@ -178,25 +178,25 @@ export default function AdminAffiliateMilestones() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-start justify-between">
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-foreground">
                         {milestone.name}
                       </h3>
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => openEdit(milestone)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                          className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setDeleteTarget(milestone)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                          className="p-1.5 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-50 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       {milestone.description}
                     </p>
                     <div className="flex items-center gap-2 mt-3">
@@ -262,12 +262,12 @@ export default function AdminAffiliateMilestones() {
             onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
             placeholder="Describe this milestone"
           />
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm font-medium text-foreground cursor-pointer">
             <input
               type="checkbox"
               checked={form.is_active}
               onChange={(e) => setForm(prev => ({ ...prev, is_active: e.target.checked }))}
-              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              className="rounded border-border text-primary-600 focus:ring-ring"
             />
             Active
           </label>

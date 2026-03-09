@@ -84,8 +84,8 @@ export default function AffiliateMessages() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Messages</h1>
+          <p className="text-muted-foreground mt-1">
             Communication with the affiliate team
           </p>
         </div>
@@ -97,7 +97,7 @@ export default function AffiliateMessages() {
       <div className="space-y-3">
         {messages.length === 0 && (
           <EmptyState
-            icon={<MessageSquare className="w-6 h-6 text-gray-400" />}
+            icon={<MessageSquare className="w-6 h-6 text-muted-foreground" />}
             title="No messages yet"
             description="Start a conversation with the affiliate team."
             actionLabel="New Message"
@@ -132,15 +132,15 @@ export default function AffiliateMessages() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-gray-900">
+                    <h3 className="font-medium text-foreground">
                       Message
                     </h3>
                     {!message.is_read && <Badge variant="primary">New</Badge>}
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {message.body}
                   </p>
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     {relativeTime(message.created_at)} -{" "}
                     {message.sender_role === "admin" ? "Admin" : "You"}
                   </p>

@@ -82,7 +82,7 @@ export default function AffiliateResources() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-gray-500">Loading resources...</div>
+        <div className="text-muted-foreground">Loading resources...</div>
       </div>
     );
   }
@@ -98,10 +98,10 @@ export default function AffiliateResources() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-foreground">
           Marketing Resources
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-muted-foreground mt-1">
           Banners, copy, and promotional materials for your campaigns
         </p>
       </div>
@@ -119,13 +119,13 @@ export default function AffiliateResources() {
 
       {assets.length === 0 ? (
         <EmptyState
-          icon={<FolderOpen className="w-6 h-6 text-gray-400" />}
+          icon={<FolderOpen className="w-6 h-6 text-muted-foreground" />}
           title="No resources available yet"
           description="Marketing materials will appear here once they are added."
         />
       ) : filteredAssets.length === 0 ? (
         <EmptyState
-          icon={<FolderOpen className="w-6 h-6 text-gray-400" />}
+          icon={<FolderOpen className="w-6 h-6 text-muted-foreground" />}
           title="No resources match your filter"
           description="Try adjusting your search or filter to find what you're looking for."
           actionLabel="Clear filters"
@@ -138,13 +138,13 @@ export default function AffiliateResources() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                    <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
                       {typeIcons[asset.asset_type] || <FileText className="w-5 h-5" />}
                     </div>
                     <div>
                       <CardTitle className="text-base">{asset.title}</CardTitle>
                       {asset.description && (
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-muted-foreground">
                           {asset.description}
                         </span>
                       )}
@@ -155,18 +155,18 @@ export default function AffiliateResources() {
               </CardHeader>
               <CardContent>
                 {asset.asset_type === "banner" ? (
-                  <div className="bg-gray-100 rounded-lg p-4 text-center text-sm text-gray-500 mb-4">
+                  <div className="bg-muted rounded-lg p-4 text-center text-sm text-muted-foreground mb-4">
                     {asset.file_url ? (
                       <img src={asset.file_url} alt={asset.title} className="max-w-full h-auto mx-auto" />
                     ) : (
-                      <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+                      <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
                         <Image className="w-10 h-10 mb-2" />
                         <span>No preview available</span>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-muted-foreground bg-muted rounded-lg p-3 mb-4">
                     {asset.content}
                   </p>
                 )}

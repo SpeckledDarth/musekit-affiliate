@@ -56,7 +56,7 @@ export function ConfirmDialog({
             </div>
           </div>
         )}
-        <p className="text-sm text-gray-600 dark:text-gray-300">{message}</p>
+        <p className="text-sm text-muted-foreground">{message}</p>
       </div>
     </Modal>
   );

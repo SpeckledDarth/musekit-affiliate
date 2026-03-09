@@ -23,9 +23,9 @@ export function Sidebar({ title, items, backHref, backLabel }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 min-h-screen flex flex-col">
+    <aside className="w-64 bg-card border-r border-border min-h-screen flex flex-col">
       <div className="p-6">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h2>
+        <h2 className="text-lg font-bold text-foreground">{title}</h2>
         {backHref && (
           <Link
             href={backHref}
@@ -45,8 +45,8 @@ export function Sidebar({ title, items, backHref, backLabel }: SidebarProps) {
               className={clsx(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium mb-1 transition-colors",
                 isActive
-                  ? "bg-primary-50 text-primary-700 dark:bg-gray-800 dark:text-primary-400"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200",
+                  ? "bg-primary-50 text-primary-700 dark:bg-muted dark:text-primary-400"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
               <item.icon className="w-5 h-5" />
@@ -55,7 +55,7 @@ export function Sidebar({ title, items, backHref, backLabel }: SidebarProps) {
           );
         })}
       </nav>
-      <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="px-6 py-4 border-t border-border">
         <ThemeToggle />
       </div>
     </aside>

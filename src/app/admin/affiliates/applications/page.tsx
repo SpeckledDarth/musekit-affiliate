@@ -69,8 +69,8 @@ export default function AffiliateApplications() {
       header: "Name / Email",
       render: (app: AffiliateApplication) => (
         <div>
-          <div className="font-medium text-gray-900">{app.name}</div>
-          <div className="text-sm text-gray-500">{app.email}</div>
+          <div className="font-medium text-foreground">{app.name}</div>
+          <div className="text-sm text-muted-foreground">{app.email}</div>
         </div>
       ),
     },
@@ -79,9 +79,9 @@ export default function AffiliateApplications() {
       header: "Website",
       render: (app: AffiliateApplication) =>
         app.website_url ? (
-          <span className="text-sm text-gray-600">{app.website_url}</span>
+          <span className="text-sm text-muted-foreground">{app.website_url}</span>
         ) : (
-          <span className="text-sm text-gray-400">—</span>
+          <span className="text-sm text-muted-foreground">—</span>
         ),
     },
     {
@@ -97,7 +97,7 @@ export default function AffiliateApplications() {
       key: "created_at",
       header: "Applied Date",
       render: (app: AffiliateApplication) => (
-        <span className="text-sm text-gray-600">{formatDate(app.created_at)}</span>
+        <span className="text-sm text-muted-foreground">{formatDate(app.created_at)}</span>
       ),
     },
     {
@@ -124,7 +124,7 @@ export default function AffiliateApplications() {
             </Button>
           </div>
         ) : (
-          <span className="text-sm text-gray-400">Reviewed</span>
+          <span className="text-sm text-muted-foreground">Reviewed</span>
         ),
     },
   ];
@@ -144,10 +144,10 @@ export default function AffiliateApplications() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-foreground">
           Affiliate Applications
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-muted-foreground mt-1">
           Review and manage affiliate applications
         </p>
       </div>
@@ -160,7 +160,7 @@ export default function AffiliateApplications() {
         searchPlaceholder="Search by name, email, or website..."
         filters={filters}
         emptyMessage="No applications found"
-        emptyIcon={<FileText className="w-8 h-8 text-gray-400" />}
+        emptyIcon={<FileText className="w-8 h-8 text-muted-foreground" />}
         title="Applications"
         exportable
         exportFilename="affiliate-applications"

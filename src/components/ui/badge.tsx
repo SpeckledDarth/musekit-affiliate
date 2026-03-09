@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 
 const variants: Record<string, string> = {
-  default: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+  default: "bg-muted text-foreground",
   primary: "bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300",
   success: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
   warning: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",

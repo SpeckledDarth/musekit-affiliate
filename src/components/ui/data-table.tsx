@@ -263,7 +263,7 @@ function DataTableInner({
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="animate-pulse flex gap-4">
               {columns.map((_, j) => (
-                <div key={j} className="h-4 bg-gray-200 dark:bg-gray-700 rounded flex-1" />
+                <div key={j} className="h-4 bg-muted rounded flex-1" />
               ))}
             </div>
           ))}
@@ -275,13 +275,13 @@ function DataTableInner({
   return (
     <Card className="overflow-hidden">
       {showToolbar && (
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 space-y-3">
+        <div className="px-6 py-4 border-b border-border space-y-3">
           {(title || headerActions) && (
             <div className="flex items-center justify-between">
               {title && (
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-sm font-semibold text-foreground">
                   {title}
-                  <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
+                  <span className="ml-2 text-xs font-normal text-muted-foreground">
                     ({processedData.length} {processedData.length === 1 ? "record" : "records"})
                   </span>
                 </h3>
@@ -304,7 +304,7 @@ function DataTableInner({
                 key={filter.key}
                 value={filterValues[filter.key] || "all"}
                 onChange={(e) => handleFilter(filter.key, e.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
+                className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="all">{filter.label}: All</option>
                 {filter.options.map((opt) => (
@@ -317,7 +317,7 @@ function DataTableInner({
             {exportable && (
               <button
                 onClick={handleExport}
-                className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <Download className="w-4 h-4" />
                 Download CSV
@@ -330,14 +330,14 @@ function DataTableInner({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50 dark:bg-gray-900/50 dark:border-gray-700">
+            <tr className="border-b border-border bg-muted">
               {selectable && (
                 <th className="px-6 py-3 w-10">
                   <input
                     type="checkbox"
                     checked={paginatedData.length > 0 && selectedIds.size === paginatedData.length}
                     onChange={handleSelectAll}
-                    className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                    className="rounded border-border text-primary-600 focus:ring-primary-500"
                   />
                 </th>
               )}
@@ -347,8 +347,8 @@ function DataTableInner({
                   <th
                     key={col.key}
                     className={clsx(
-                      "px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
-                      isSortable && "cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-300",
+                      "px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider",
+                      isSortable && "cursor-pointer select-none hover:text-foreground",
                     )}
                     onClick={isSortable ? () => handleSort(col.key) : undefined}
                   >
@@ -359,7 +359,7 @@ function DataTableInner({
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="divide-y divide-border">
             {paginatedData.length === 0 ? (
               <tr>
                 <td colSpan={columns.length + (selectable ? 1 : 0)}>
@@ -378,7 +378,7 @@ function DataTableInner({
                   <tr
                     key={localIndex}
                     className={clsx(
-                      "hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors",
+                      "hover:bg-muted transition-colors",
                       onRowClick && "cursor-pointer",
                       selectedIds.has(globalIndex) && "bg-primary-50 dark:bg-primary-900/30",
                     )}
@@ -390,14 +390,14 @@ function DataTableInner({
                           type="checkbox"
                           checked={selectedIds.has(globalIndex)}
                           onChange={() => handleSelectRow(globalIndex, item)}
-                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                          className="rounded border-border text-primary-600 focus:ring-primary-500"
                         />
                       </td>
                     )}
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        className="px-6 py-4 text-sm text-gray-900 dark:text-gray-200 whitespace-nowrap"
+                        className="px-6 py-4 text-sm text-foreground whitespace-nowrap"
                       >
                         {col.render
                           ? col.render(item)
@@ -413,8 +413,8 @@ function DataTableInner({
       </div>
 
       {processedData.length > pageSize && (
-        <div className="px-6 py-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="px-6 py-3 border-t border-border flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
             Showing {(page - 1) * pageSize + 1}–
             {Math.min(page * pageSize, processedData.length)} of{" "}
             {processedData.length}
@@ -423,17 +423,17 @@ function DataTableInner({
             <button
               onClick={() => handleSetPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="p-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-lg border border-border text-muted-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-sm text-gray-600 dark:text-gray-400 px-2">
+            <span className="text-sm text-muted-foreground px-2">
               Page {page} of {totalPages}
             </span>
             <button
               onClick={() => handleSetPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
-              className="p-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-lg border border-border text-muted-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -452,7 +452,7 @@ export function DataTable(props: DataTableProps) {
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="animate-pulse flex gap-4">
               {props.columns.map((_, j) => (
-                <div key={j} className="h-4 bg-gray-200 dark:bg-gray-700 rounded flex-1" />
+                <div key={j} className="h-4 bg-muted rounded flex-1" />
               ))}
             </div>
           ))}

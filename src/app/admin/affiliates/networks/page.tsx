@@ -23,10 +23,10 @@ export default function AdminAffiliateNetworks() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-foreground">
           Network Integrations
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-muted-foreground mt-1">
           Connect with affiliate networks to expand your reach
         </p>
       </div>
@@ -37,8 +37,8 @@ export default function AdminAffiliateNetworks() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <Globe className="w-5 h-5 text-gray-500" />
+                  <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                    <Globe className="w-5 h-5 text-muted-foreground" />
                   </div>
                   <CardTitle className="text-base">{network.name}</CardTitle>
                 </div>
@@ -56,7 +56,7 @@ export default function AdminAffiliateNetworks() {
             <CardContent>
               {network.status === "connected" ? (
                 <div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     {network.affiliates} affiliates from this network
                   </p>
                   <a
@@ -70,7 +70,7 @@ export default function AdminAffiliateNetworks() {
                   </a>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Connect to import affiliates from this network
                 </p>
               )}

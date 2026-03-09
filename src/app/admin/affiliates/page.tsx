@@ -11,13 +11,13 @@ import type { AdminOverview, AffiliateListItem } from "@/types";
 
 function SkeletonStatCard() {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 animate-pulse">
+    <div className="bg-card rounded-xl border border-border shadow-sm p-6 animate-pulse">
       <div className="flex items-center justify-between mb-2">
-        <div className="h-4 bg-gray-200 rounded w-24" />
-        <div className="h-5 w-5 bg-gray-200 rounded" />
+        <div className="h-4 bg-muted rounded w-24" />
+        <div className="h-5 w-5 bg-muted rounded" />
       </div>
-      <div className="h-8 bg-gray-200 rounded w-20 mt-2" />
-      <div className="h-3 bg-gray-200 rounded w-16 mt-2" />
+      <div className="h-8 bg-muted rounded w-20 mt-2" />
+      <div className="h-3 bg-muted rounded w-16 mt-2" />
     </div>
   );
 }
@@ -26,22 +26,22 @@ function SkeletonList() {
   return (
     <Card>
       <CardHeader>
-        <div className="h-5 bg-gray-200 rounded w-32 animate-pulse" />
+        <div className="h-5 bg-muted rounded w-32 animate-pulse" />
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center justify-between py-2 animate-pulse">
               <div className="flex items-center gap-3">
-                <div className="w-6 h-6 bg-gray-200 rounded-full" />
+                <div className="w-6 h-6 bg-muted rounded-full" />
                 <div>
-                  <div className="h-4 bg-gray-200 rounded w-32 mb-1" />
-                  <div className="h-3 bg-gray-200 rounded w-40" />
+                  <div className="h-4 bg-muted rounded w-32 mb-1" />
+                  <div className="h-3 bg-muted rounded w-40" />
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="h-5 bg-gray-200 rounded-full w-16" />
-                <div className="h-5 bg-gray-200 rounded w-20" />
+                <div className="h-5 bg-muted rounded-full w-16" />
+                <div className="h-5 bg-muted rounded w-20" />
               </div>
             </div>
           ))}
@@ -79,10 +79,10 @@ export default function AdminAffiliatesOverview() {
     return (
       <div>
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-foreground">
             Affiliate Program Overview
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-muted-foreground mt-1">
             Manage and monitor your affiliate program
           </p>
         </div>
@@ -108,10 +108,10 @@ export default function AdminAffiliatesOverview() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-foreground">
           Affiliate Program Overview
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-muted-foreground mt-1">
           Manage and monitor your affiliate program
         </p>
       </div>
@@ -150,22 +150,22 @@ export default function AdminAffiliatesOverview() {
         <CardContent>
           <div className="space-y-4">
             {topPerformers.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No affiliates yet</p>
+              <p className="text-muted-foreground text-center py-4">No affiliates yet</p>
             ) : (
               topPerformers.map((affiliate, i) => (
                 <div
                   key={affiliate.user_id}
-                  className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0"
+                  className="flex items-center justify-between py-2 border-b border-border last:border-0"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold text-gray-500">
+                    <span className="w-6 h-6 bg-muted rounded-full flex items-center justify-center text-xs font-bold text-muted-foreground">
                       {i + 1}
                     </span>
                     <div>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-foreground">
                         {affiliate.profile?.full_name || affiliate.profile?.email || affiliate.ref_code}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         {affiliate.profile?.email || affiliate.ref_code}
                       </p>
                     </div>
@@ -174,7 +174,7 @@ export default function AdminAffiliatesOverview() {
                     <Badge variant="primary">
                       {affiliate.affiliate_role.toUpperCase()}
                     </Badge>
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-semibold text-foreground">
                       {formatCents(affiliate.total_earnings_cents)}
                     </span>
                   </div>

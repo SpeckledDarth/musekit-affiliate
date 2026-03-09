@@ -107,7 +107,7 @@ export default function AdminAffiliatePayoutRuns() {
       key: "notes",
       header: "Notes",
       render: (item: AffiliatePayoutBatch) => (
-        <span className="text-gray-500 truncate max-w-[200px] block">
+        <span className="text-muted-foreground truncate max-w-[200px] block">
           {item.notes || "—"}
         </span>
       ),
@@ -126,8 +126,8 @@ export default function AdminAffiliatePayoutRuns() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Payout Runs</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Payout Runs</h1>
+          <p className="text-muted-foreground mt-1">
             Batch payment processing for affiliates
           </p>
         </div>
@@ -200,9 +200,9 @@ export default function AdminAffiliatePayoutRuns() {
             onChange={(e) => setForm((f) => ({ ...f, total_amount: e.target.value }))}
           />
           <div className="w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Notes</label>
             <textarea
-              className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary-500"
               rows={3}
               placeholder="Optional notes about this payout run"
               value={form.notes}

@@ -56,17 +56,17 @@ export function Modal({
       />
       <div
         className={clsx(
-          "relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full mx-4",
+          "relative bg-card text-card-foreground rounded-xl shadow-xl w-full mx-4",
           "max-h-[90vh] flex flex-col",
           sizeClasses[size],
         )}
       >
         {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+            <h2 className="text-lg font-semibold text-foreground">{title}</h2>
             <button
               onClick={onClose}
-              className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -74,7 +74,7 @@ export function Modal({
         )}
         <div className="px-6 py-4 overflow-y-auto flex-1">{children}</div>
         {footer && (
-          <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-end gap-3">
+          <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-3">
             {footer}
           </div>
         )}

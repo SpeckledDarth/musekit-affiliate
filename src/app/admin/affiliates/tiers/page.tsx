@@ -135,21 +135,21 @@ export default function AdminAffiliateTiers() {
     return (
       <div>
         <div className="mb-8">
-          <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-          <div className="h-4 w-72 bg-gray-200 rounded animate-pulse mt-2" />
+          <div className="h-8 w-48 bg-muted rounded animate-pulse" />
+          <div className="h-4 w-72 bg-muted rounded animate-pulse mt-2" />
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} className="overflow-hidden">
-              <div className="h-1 bg-gray-200" />
+              <div className="h-1 bg-muted" />
               <CardHeader>
-                <div className="h-6 w-24 bg-gray-200 rounded animate-pulse" />
+                <div className="h-6 w-24 bg-muted rounded animate-pulse" />
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="h-10 w-20 mx-auto bg-gray-200 rounded animate-pulse" />
-                  <div className="h-4 w-full bg-gray-200 rounded animate-pulse" />
-                  <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-10 w-20 mx-auto bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
                 </div>
               </CardContent>
             </Card>
@@ -171,8 +171,8 @@ export default function AdminAffiliateTiers() {
     <div>
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Affiliate Tiers</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Affiliate Tiers</h1>
+          <p className="text-muted-foreground mt-1">
             Commission tiers and their requirements
           </p>
         </div>
@@ -184,7 +184,7 @@ export default function AdminAffiliateTiers() {
 
       {tiers.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center text-gray-500">
+          <CardContent className="py-12 text-center text-muted-foreground">
             No tiers configured yet
           </CardContent>
         </Card>
@@ -192,7 +192,7 @@ export default function AdminAffiliateTiers() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {tiers.map((tier) => {
             const tierKey = tier.name.toLowerCase();
-            const colorClass = tierColors[tierKey] || "bg-gray-100 text-gray-700";
+            const colorClass = tierColors[tierKey] || "bg-muted text-muted-foreground";
             return (
               <Card key={tier.id} className="relative overflow-hidden">
                 <div
@@ -209,13 +209,13 @@ export default function AdminAffiliateTiers() {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => openEdit(tier)}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setDeleteTarget(tier)}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-50 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -224,18 +224,18 @@ export default function AdminAffiliateTiers() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-center mb-4">
-                    <span className="text-3xl font-bold text-gray-900">
+                    <span className="text-3xl font-bold text-foreground">
                       {tier.commission_rate}%
                     </span>
-                    <p className="text-sm text-gray-500">commission</p>
+                    <p className="text-sm text-muted-foreground">commission</p>
                   </div>
                   <div className="space-y-2 mb-4">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-muted-foreground">
                       <span className="font-medium">Min Referrals:</span>{" "}
                       {tier.min_referrals}
                     </div>
                     {tier.min_payout_cents != null && (
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-muted-foreground">
                         <span className="font-medium">Min Payout:</span>{" "}
                         {formatCents(tier.min_payout_cents)}
                       </div>
@@ -246,7 +246,7 @@ export default function AdminAffiliateTiers() {
                       {tier.perks.map((perk) => (
                         <li
                           key={perk}
-                          className="flex items-center gap-2 text-sm text-gray-600"
+                          className="flex items-center gap-2 text-sm text-muted-foreground"
                         >
                           <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
                           {perk}

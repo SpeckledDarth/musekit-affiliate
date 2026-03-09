@@ -76,10 +76,10 @@ export default function AffiliateDashboard() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-foreground">
           Welcome back{link ? `, ${link.ref_code}` : ""}
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-muted-foreground mt-1">
           Here&apos;s an overview of your affiliate performance
         </p>
       </div>
@@ -122,31 +122,31 @@ export default function AffiliateDashboard() {
           <CardContent>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">Referral Code</span>
-                <code className="bg-gray-100 px-3 py-1 rounded text-sm font-mono">
+                <span className="text-sm text-muted-foreground">Referral Code</span>
+                <code className="bg-muted px-3 py-1 rounded text-sm font-mono">
                   {link?.ref_code ?? "—"}
                 </code>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">Role</span>
+                <span className="text-sm text-muted-foreground">Role</span>
                 <Badge variant="primary">
                   {(link?.affiliate_role ?? "affiliate").toUpperCase()}
                 </Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">Commission Rate</span>
+                <span className="text-sm text-muted-foreground">Commission Rate</span>
                 <span className="font-semibold">
                   {link?.locked_commission_rate != null ? `${link.locked_commission_rate}%` : "Default"}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">Status</span>
+                <span className="text-sm text-muted-foreground">Status</span>
                 <Badge variant={link?.suspended ? "danger" : "success"}>
                   {link?.suspended ? "Suspended" : "Active"}
                 </Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">Member Since</span>
+                <span className="text-sm text-muted-foreground">Member Since</span>
                 <span className="text-sm">
                   {formatDate(link?.created_at)}
                 </span>
@@ -159,24 +159,24 @@ export default function AffiliateDashboard() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Recent Commissions</CardTitle>
-              <Users className="w-5 h-5 text-gray-400" />
+              <Users className="w-5 h-5 text-muted-foreground" />
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {commissions.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-4">No commissions yet</p>
+                <p className="text-sm text-muted-foreground text-center py-4">No commissions yet</p>
               ) : (
                 commissions.map((comm) => (
                   <div
                     key={comm.id}
-                    className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0"
+                    className="flex items-center justify-between py-2 border-b border-border last:border-0"
                   >
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-foreground">
                         {formatCents(comm.invoice_amount_cents)} sale
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         {formatDate(comm.created_at)}
                       </p>
                     </div>

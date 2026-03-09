@@ -104,7 +104,7 @@ export default function AdminAffiliateDiscountCodes() {
       key: "code",
       header: "Code",
       render: (item: DiscountCode) => (
-        <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono font-semibold">
+        <code className="bg-muted px-2 py-1 rounded text-sm font-mono font-semibold">
           {item.code}
         </code>
       ),
@@ -208,8 +208,8 @@ export default function AdminAffiliateDiscountCodes() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Discount Codes</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Discount Codes</h1>
+          <p className="text-muted-foreground mt-1">
             Create and manage discount codes for affiliates
           </p>
         </div>
@@ -255,11 +255,11 @@ export default function AdminAffiliateDiscountCodes() {
             placeholder="e.g. SUMMER20"
           />
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Discount Type</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Discount Type</label>
             <select
               value={form.discount_type}
               onChange={(e) => setForm((f) => ({ ...f, discount_type: e.target.value as "percentage" | "fixed" }))}
-              className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary-500"
             >
               <option value="percentage">Percentage (%)</option>
               <option value="fixed">Fixed Amount ($)</option>

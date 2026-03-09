@@ -74,8 +74,8 @@ export default function AdminAffiliateSettings() {
     return (
       <div>
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Program Settings</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Program Settings</h1>
+          <p className="text-muted-foreground mt-1">
             Configure commission rates, cookie duration, and payout settings
           </p>
         </div>
@@ -84,7 +84,7 @@ export default function AdminAffiliateSettings() {
             <CardContent>
               <div className="space-y-4">
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div key={i} className="h-10 bg-muted rounded animate-pulse" />
                 ))}
               </div>
             </CardContent>
@@ -97,8 +97,8 @@ export default function AdminAffiliateSettings() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Program Settings</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Program Settings</h1>
+        <p className="text-muted-foreground mt-1">
           Configure commission rates, cookie duration, and payout settings
         </p>
       </div>
@@ -133,13 +133,13 @@ export default function AdminAffiliateSettings() {
                 min={0}
               />
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Payout Schedule
                 </label>
                 <select
                   value={payoutSchedule}
                   onChange={(e) => setPayoutSchedule(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
+                  className="block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary-500"
                 >
                   <option value="monthly">Monthly</option>
                   <option value="biweekly">Bi-weekly</option>
@@ -164,9 +164,9 @@ export default function AdminAffiliateSettings() {
                   type="checkbox"
                   checked={autoApprove}
                   onChange={(e) => setAutoApprove(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-primary-600"
+                  className="w-4 h-4 rounded border-border text-primary-600"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <span className="text-sm text-foreground">
                   Auto-approve new affiliate applications
                 </span>
               </label>
@@ -175,9 +175,9 @@ export default function AdminAffiliateSettings() {
                   type="checkbox"
                   checked={requireEmailVerification}
                   onChange={(e) => setRequireEmailVerification(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-primary-600"
+                  className="w-4 h-4 rounded border-border text-primary-600"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <span className="text-sm text-foreground">
                   Require email verification before activation
                 </span>
               </label>

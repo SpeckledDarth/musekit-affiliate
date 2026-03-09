@@ -165,7 +165,7 @@ export default function AdminAffiliateAssets() {
       header: "Asset",
       render: (item: AffiliateAsset) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+          <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
             {typeIcons[item.asset_type] || <FileText className="w-4 h-4" />}
           </div>
           <span className="font-medium">{item.title}</span>
@@ -185,7 +185,7 @@ export default function AdminAffiliateAssets() {
       key: "description",
       header: "Description",
       render: (item: AffiliateAsset) => (
-        <span className="text-gray-500 truncate max-w-[200px] block">
+        <span className="text-muted-foreground truncate max-w-[200px] block">
           {item.description || "—"}
         </span>
       ),
@@ -229,8 +229,8 @@ export default function AdminAffiliateAssets() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Marketing Assets</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Marketing Assets</h1>
+          <p className="text-muted-foreground mt-1">
             Upload and manage marketing materials for affiliates
           </p>
         </div>
@@ -282,13 +282,13 @@ export default function AdminAffiliateAssets() {
             placeholder="Brief description"
           />
           <div className="w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Asset Type
             </label>
             <select
               value={form.asset_type}
               onChange={(e) => setForm((f) => ({ ...f, asset_type: e.target.value }))}
-              className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary-500"
             >
               <option value="banner">Banner</option>
               <option value="text">Text</option>
@@ -303,7 +303,7 @@ export default function AdminAffiliateAssets() {
             placeholder="Text content or embed code"
           />
           <div className="w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               File Upload
             </label>
             <div className="flex items-center gap-2">

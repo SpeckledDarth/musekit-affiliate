@@ -42,7 +42,7 @@ export default function AffiliateLayout({
         backHref="/"
         backLabel="&larr; Home"
       />
-      <main className="flex-1 bg-gray-50 dark:bg-gray-900">
+      <main className="flex-1 bg-background">
         <div className="p-8">{children}</div>
       </main>
     </div>
