@@ -56,7 +56,7 @@ export function Modal({
       />
       <div
         className={clsx(
-          "relative bg-card text-card-foreground rounded-xl shadow-xl w-full mx-4",
+          "relative bg-card text-card-foreground rounded-lg shadow-xl w-full mx-4",
           "max-h-[90vh] flex flex-col",
           sizeClasses[size],
         )}

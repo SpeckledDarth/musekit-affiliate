@@ -9,7 +9,7 @@ export function Card({ children, className }: CardProps) {
   return (
     <div
       className={clsx(
-        "bg-card text-card-foreground rounded-xl border border-border shadow-sm",
+        "bg-card text-card-foreground rounded-lg border border-border shadow-sm",
         className,
       )}
     >

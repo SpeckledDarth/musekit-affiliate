@@ -188,8 +188,8 @@ export default function AffiliateAnalytics() {
                   <Area
                     type="monotone"
                     dataKey="clicks"
-                    stroke="#4c6ef5"
-                    fill="#dbe4ff"
+                    stroke="var(--chart-primary)"
+                    fill="var(--primary-100)"
                     strokeWidth={2}
                   />
                 </AreaChart>
@@ -230,13 +230,13 @@ export default function AffiliateAnalytics() {
                   <Bar
                     yAxisId="left"
                     dataKey="conversions"
-                    fill="#4c6ef5"
+                    fill="var(--chart-primary)"
                     radius={[4, 4, 0, 0]}
                   />
                   <Bar
                     yAxisId="right"
                     dataKey="revenue"
-                    fill="#e64980"
+                    fill="var(--chart-secondary)"
                     radius={[4, 4, 0, 0]}
                   />
                 </BarChart>

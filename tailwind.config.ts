@@ -1,6 +1,13 @@
 import type { Config } from "tailwindcss";
 
+let designSystemPreset: any = null;
+try {
+  designSystemPreset = require("@musekit/design-system").tailwindPreset;
+} catch {
+}
+
 const config: Config = {
+  ...(designSystemPreset ? { presets: [designSystemPreset] } : {}),
   darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -33,30 +40,30 @@ const config: Config = {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
-          50: "#f0f4ff",
-          100: "#dbe4ff",
-          200: "#bac8ff",
-          300: "#91a7ff",
-          400: "#748ffc",
-          500: "#5c7cfa",
-          600: "#4c6ef5",
-          700: "#4263eb",
-          800: "#3b5bdb",
-          900: "#364fc7",
+          50: "var(--primary-50)",
+          100: "var(--primary-100)",
+          200: "var(--primary-200)",
+          300: "var(--primary-300)",
+          400: "var(--primary-400)",
+          500: "var(--primary-500)",
+          600: "var(--primary-600)",
+          700: "var(--primary-700)",
+          800: "var(--primary-800)",
+          900: "var(--primary-900)",
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
-          50: "#fff0f6",
-          100: "#ffdeeb",
-          200: "#fcc2d7",
-          300: "#faa2c1",
-          400: "#f783ac",
-          500: "#f06595",
-          600: "#e64980",
-          700: "#d6336c",
-          800: "#c2255c",
-          900: "#a61e4d",
+          50: "var(--accent-50)",
+          100: "var(--accent-100)",
+          200: "var(--accent-200)",
+          300: "var(--accent-300)",
+          400: "var(--accent-400)",
+          500: "var(--accent-500)",
+          600: "var(--accent-600)",
+          700: "var(--accent-700)",
+          800: "var(--accent-800)",
+          900: "var(--accent-900)",
         },
       },
       borderColor: {

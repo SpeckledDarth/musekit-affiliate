@@ -55,7 +55,7 @@ export default function HomePage() {
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           <Link
             href="/affiliate"
-            className="group bg-card rounded-xl border border-border p-8 hover:border-primary-400 hover:shadow-lg transition-all"
+            className="group bg-card rounded-lg border border-border p-8 hover:border-primary-400 hover:shadow-lg transition-all"
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
@@ -76,7 +76,7 @@ export default function HomePage() {
 
           <Link
             href="/admin/affiliates"
-            className="group bg-card rounded-xl border border-border p-8 hover:border-accent-400 hover:shadow-lg transition-all"
+            className="group bg-card rounded-lg border border-border p-8 hover:border-accent-400 hover:shadow-lg transition-all"
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-accent-100 rounded-lg flex items-center justify-center">
@@ -125,7 +125,7 @@ export default function HomePage() {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="bg-card rounded-xl border border-border p-6"
+              className="bg-card rounded-lg border border-border p-6"
             >
               <div className="flex items-center gap-3 mb-2">
                 <stat.icon className="w-5 h-5 text-muted-foreground" />

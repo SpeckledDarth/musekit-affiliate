@@ -11,7 +11,7 @@ import type { AdminOverview, AffiliateListItem } from "@/types";
 
 function SkeletonStatCard() {
   return (
-    <div className="bg-card rounded-xl border border-border shadow-sm p-6 animate-pulse">
+    <div className="bg-card rounded-lg border border-border shadow-sm p-6 animate-pulse">
       <div className="flex items-center justify-between mb-2">
         <div className="h-4 bg-muted rounded w-24" />
         <div className="h-5 w-5 bg-muted rounded" />

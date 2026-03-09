@@ -15,7 +15,7 @@ import type { AffiliateTier } from "@/types";
 
 const tierColors: Record<string, string> = {
   bronze: "bg-orange-100 text-orange-700",
-  silver: "bg-gray-200 text-gray-700",
+  silver: "bg-muted text-muted-foreground",
   gold: "bg-yellow-100 text-yellow-700",
   platinum: "bg-purple-100 text-purple-700",
 };
